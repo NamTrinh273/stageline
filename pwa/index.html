@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="StageLine">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <title>StageLine — Concert Lyrics</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #0E0E12;
+      --active: #121216;
+      --border: #22222A;
+      --text: #E2E2E6;
+      --sub: #8E8E93;
+      --tr: #7A7A80;
+      --gold: #FFD166;
+      --gold-bg: #1B170C;
+      --danger: #FF6B6B;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      overscroll-behavior: none;
+    }
+    button, input, textarea {
+      font: inherit;
+      color: inherit;
+    }
+    button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      padding: 0;
+    }
+    .screen {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+    }
+    .screen.active {
+      display: flex;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: calc(12px + var(--safe-top)) 16px 12px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .topbar-title {
+      flex: 1;
+      min-width: 0;
+    }
+    .topbar-title h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .topbar-title .sub {
+      font-size: 12px;
+      color: var(--sub);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .brand-dot {
+      color: var(--gold);
+      margin-right: 6px;
+    }
+    .icon-btn {
+      min-width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 0 10px;
+      flex-shrink: 0;
+    }
+    .icon-btn:active {
+      opacity: 0.7;
+    }
+    .icon-btn.gold {
+      background: var(--gold);
+      color: #000000;
+      border-color: var(--gold);
+      font-weight: 700;
+    }
+    .icon-btn.danger {
+      color: var(--danger);
+    }
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 14px 16px calc(92px + var(--safe-bottom));
+    }
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 12px;
+      margin-bottom: 14px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--sub);
+    }
+    .status-badge {
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-sub {
+      font-size: 12px;
+      color: var(--sub);
+      margin-top: 4px;
+    }
+    .song-index {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--active);
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .empty {
+      text-align: center;
+      padding: 44px 16px;
+    }
+    .empty h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+    .empty p {
+      margin: 0 0 22px;
+      color: var(--sub);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .btn-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    .btn-primary {
+      background: var(--gold);
+      color: #000000;
+      font-weight: 700;
+      padding: 13px 18px;
+      border-radius: 12px;
+      font-size: 15px;
+    }
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-weight: 600;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+    .fab {
+      position: fixed;
+      right: 18px;
+      bottom: calc(18px + var(--safe-bottom));
+      background: var(--gold);
+      color: #000000;
+      font-weight: 800;
+      font-size: 15px;
+      padding: 13px 18px;
+      border-radius: 999px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+      z-index: 20;
+    }
+
+    /* Editor */
+    .field-label {
+      display: block;
+      font-size: 12px;
+      color: var(--sub);
+      margin: 12px 0 6px;
+      font-weight: 600;
+    }
+    .input, .textarea {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+    }
+    .input:focus, .textarea:focus {
+      border-color: var(--gold);
+    }
+    .textarea {
+      min-height: 240px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 10px 0;
+    }
+    .chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--active);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text);
+    }
+    .chip.gold {
+      color: var(--gold);
+      border-color: rgba(255, 209, 102, 0.45);
+    }
+
+    /* Concert Mode */
+    #screen-concert {
+      position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .concert-hud-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: calc(10px + var(--safe-top)) 12px 8px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .section-pills {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 8px 12px;
+      background: var(--bg);
+      border-bottom: 1px solid #141418;
+      flex-shrink: 0;
+    }
+    .section-pills::-webkit-scrollbar { display: none; }
+    .pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--sub);
+      flex-shrink: 0;
+    }
+    .pill.sing {
+      color: var(--gold);
+      border-color: rgba(255, 209, 102, 0.35);
+    }
+    .pill.current {
+      background: var(--gold);
+      color: #000000;
+      border-color: var(--gold);
+    }
+    .lyrics-scroller {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 28px 16px 46vh;
+      scroll-behavior: smooth;
+    }
+    .section-header {
+      margin: 22px 0 8px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--sub);
+    }
+    .section-header.sing {
+      color: var(--gold);
+    }
+    .lyric-line {
+      padding: 10px 14px;
+      margin: 4px 0;
+      border-radius: 12px;
+      border-left: 3px solid transparent;
+      color: var(--sub);
+      line-height: 1.38;
+      transition: background-color 0.14s ease, color 0.14s ease;
+    }
+    .lyric-line.sing {
+      border-left-color: rgba(255, 209, 102, 0.35);
+      color: rgba(255, 209, 102, 0.72);
+    }
+    .lyric-line.active {
+      background: var(--active);
+      color: var(--text);
+      font-weight: 700;
+      border-left-color: var(--text);
+    }
+    .lyric-line.sing.active {
+      background: var(--gold-bg);
+      color: var(--gold);
+      border-left-color: var(--gold);
+    }
+    .lyric-tr {
+      margin-top: 4px;
+      font-size: 0.72em;
+      font-weight: 400;
+      color: var(--tr);
+    }
+    .concert-hud-bottom {
+      padding: 10px 14px calc(12px + var(--safe-bottom));
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .hud-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .hud-row:last-child { margin-bottom: 0; }
+    .dim-slider {
+      flex: 1;
+      accent-color: var(--gold);
+    }
+    .dim-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 90;
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(26px + var(--safe-bottom));
+      transform: translateX(-50%);
+      background: #1C1C22;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      z-index: 100;
+      max-width: 90vw;
+      text-align: center;
+      display: none;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <!-- HOME SCREEN -->
+  <section id="screen-home" class="screen active">
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1><span class="brand-dot">●</span>StageLine</h1>
+      </div>
+      <button class="icon-btn" id="btn-import" title="Nhập tệp">Nhập tệp</button>
+      <button class="icon-btn" id="btn-seed-atvncg" title="Nạp ATVNCG 2026">ATVNCG</button>
+    </header>
+    <div class="scroll-area">
+      <div class="status-bar">
+        <span id="offline-status" class="status-badge">Đang lưu offline...</span>
+        <span id="net-status"></span>
+      </div>
+      <div id="setlist-list"></div>
+    </div>
+    <button class="fab" id="btn-new-setlist">+ Tạo Setlist</button>
+    <input type="file" id="file-input" accept=".concert,.json,.lrc,.txt,*/*" class="hidden">
+  </section>
+
+  <!-- SETLIST DETAIL SCREEN -->
+  <section id="screen-detail" class="screen">
+    <header class="topbar">
+      <button class="icon-btn" id="btn-detail-back">←</button>
+      <div class="topbar-title">
+        <h1 id="detail-title">Setlist</h1>
+        <div class="sub" id="detail-artist"></div>
+      </div>
+      <button class="icon-btn" id="btn-export">.concert</button>
+      <button class="icon-btn gold" id="btn-start-concert">▶ Concert</button>
+    </header>
+    <div class="scroll-area" id="song-list"></div>
+    <button class="fab" id="btn-add-song">+ Thêm bài</button>
+  </section>
+
+  <!-- QUICK LYRICS EDITOR SCREEN -->
+  <section id="screen-editor" class="screen">
+    <header class="topbar">
+      <button class="icon-btn" id="btn-editor-cancel">Hủy</button>
+      <div class="topbar-title">
+        <h1 id="editor-heading">Sửa lời bài hát</h1>
+      </div>
+      <button class="icon-btn gold" id="btn-editor-save">Lưu</button>
+    </header>
+    <div class="scroll-area">
+      <label class="field-label" for="ed-title">Tên bài hát</label>
+      <input id="ed-title" class="input" placeholder="VD: Hỏa Tâm">
+      <label class="field-label" for="ed-artist">Nghệ sĩ / Nhà (tùy chọn)</label>
+      <input id="ed-artist" class="input" placeholder="VD: 33 Anh Tài">
+      <label class="field-label" for="ed-lyrics">Lời bài hát (dán trực tiếp, hỗ trợ [Chorus], [Sing-along], dòng dịch &gt;)</label>
+      <div class="chips" id="tag-chips">
+        <button class="chip" data-tag="[Verse 1]">+ [Verse 1]</button>
+        <button class="chip" data-tag="[Pre-Chorus]">+ [Pre-Chorus]</button>
+        <button class="chip gold" data-tag="[Chorus]">+ [Chorus]</button>
+        <button class="chip" data-tag="[Bridge]">+ [Bridge]</button>
+        <button class="chip gold" data-tag="[Sing-along]">+ [Sing-along]</button>
+      </div>
+      <textarea id="ed-lyrics" class="textarea" placeholder="[Verse 1]&#10;Dòng lời thứ nhất&#10;&#10;[Chorus]&#10;Đoạn điệp khúc tô vàng"></textarea>
+    </div>
+  </section>
+
+  <!-- CONCERT MODE SCREEN -->
+  <section id="screen-concert" class="screen">
+    <header class="concert-hud-top" id="concert-top">
+      <button class="icon-btn" id="btn-concert-back">←</button>
+      <div class="topbar-title">
+        <h1 id="concert-song-title">Bài hát</h1>
+        <div class="sub" id="concert-song-meta">1 / 1</div>
+      </div>
+      <button class="icon-btn" id="btn-prev-song">‹</button>
+      <button class="icon-btn" id="btn-next-song">›</button>
+      <button class="icon-btn" id="btn-toggle-hud">⚙</button>
+    </header>
+    <div class="section-pills" id="concert-pills"></div>
+    <div class="lyrics-scroller" id="lyrics-scroller"></div>
+    <footer class="concert-hud-bottom" id="concert-bottom">
+      <div class="hud-row">
+        <span style="font-size:12px;color:var(--sub);">Extra Dim</span>
+        <input id="dim-slider" class="dim-slider" type="range" min="0" max="85" value="0">
+        <span id="dim-val" style="font-size:12px;width:34px;text-align:right;color:var(--gold);">0%</span>
+      </div>
+      <div class="hud-row">
+        <button class="icon-btn" id="btn-font-dec">A-</button>
+        <button class="icon-btn" id="btn-font-inc">A+</button>
+        <button class="icon-btn" id="btn-toggle-tr">Dịch: Bật</button>
+        <button class="icon-btn" id="btn-step-prev">↑ Lùi</button>
+        <button class="icon-btn gold" id="btn-step-next">↓ Tiếp</button>
+      </div>
+    </footer>
+  </section>
+
+  <div id="dim-overlay" class="dim-overlay"></div>
+  <div id="toast" class="toast"></div>
+
+  <script>
+    (() => {
+      const STORAGE_PREFIX = 'stageline:v1:setlist:';
+      const state = {
+        setlists: [],
+        currentSetlistId: null,
+        editingSongIndex: -1,
+        concertSetlist: null,
+        concertSongIdx: 0,
+        activeLineIdx: 0,
+        fontSize: 22,
+        showTr: true,
+        hudVisible: true,
+        wakeLock: null,
+      };
+
+      const $ = (id) => document.getElementById(id);
+
+      // Register Offline-First Service Worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          const markReady = () => {
+            $('offline-status').textContent = '✓ Sẵn sàng Offline (Chế độ máy bay OK)';
+          };
+          if (navigator.serviceWorker.controller || reg.active) {
+            markReady();
+          } else {
+            reg.addEventListener('updatefound', () => {
+              const nw = reg.installing;
+              if (!nw) return;
+              nw.addEventListener('statechange', () => {
+                if (nw.state === 'activated') markReady();
+              });
+            });
+          }
+        }).catch(() => {
+          $('offline-status').textContent = 'Lưu offline cục bộ trong Safari';
+        });
+      } else {
+        $('offline-status').textContent = 'Lưu offline cục bộ';
+      }
+
+      const updateNetStatus = () => {
+        $('net-status').textContent = navigator.onLine ? 'Online' : 'Offline Mode';
+      };
+      window.addEventListener('online', updateNetStatus);
+      window.addEventListener('offline', updateNetStatus);
+      updateNetStatus();
+
+      function showToast(msg) {
+        const el = $('toast');
+        el.textContent = msg;
+        el.style.display = 'block';
+        clearTimeout(el._t);
+        el._t = setTimeout(() => { el.style.display = 'none'; }, 2600);
+      }
+
+      function showScreen(id) {
+        document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
+        $(id).classList.add('active');
+        if (id !== 'screen-concert') releaseWakeLock();
+      }
+
+      // Storage (exact .concert v1 schema compatible with Android/iOS Flutter app)
+      function loadSetlists() {
+        const out = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (!k || !k.startsWith(STORAGE_PREFIX)) continue;
+          try {
+            const obj = JSON.parse(localStorage.getItem(k));
+            if (obj && obj.v === 1 && Array.isArray(obj.songs)) out.push(obj);
+          } catch (_) {}
+        }
+        out.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+        state.setlists = out;
+      }
+
+      function saveSetlist(setlist) {
+        setlist.v = 1;
+        setlist.updatedAt = new Date().toISOString();
+        const safeId = (setlist.id || ('sl-' + Date.now().toString(36))).replace(/[^a-zA-Z0-9._-]/g, '_');
+        setlist.id = safeId;
+        localStorage.setItem(STORAGE_PREFIX + safeId, JSON.stringify(setlist));
+        loadSetlists();
+      }
+
+      function deleteSetlist(id) {
+        localStorage.removeItem(STORAGE_PREFIX + id);
+        loadSetlists();
+      }
+
+      // Parser (.txt / .lrc -> Song)
+      function isSingAlongTag(tag) {
+        const t = tag.toLowerCase();
+        if (t.includes('pre-chorus') || t.includes('pre chorus')) return false;
+        return t.includes('chorus') || t.includes('sing-along') || t.includes('sing along') || t.includes('fanchant') || t.includes('điệp khúc');
+      }
+
+      function parseLyricsText(raw, fallbackTitle, fallbackArtist) {
+        const lines = raw.replace(/\r\n/g, '\n').split('\n');
+        let title = fallbackTitle || 'Bài hát mới';
+        let artist = fallbackArtist || '';
+        const sections = [];
+        let current = null;
+
+        const ensureSection = (tag) => {
+          current = { tag, singAlong: isSingAlongTag(tag), lines: [] };
+          sections.push(current);
+        };
+
+        for (let rawLine of lines) {
+          let line = rawLine.trim();
+          if (!line) continue;
+
+          const ti = line.match(/^\[ti:(.+?)\]$/i);
+          if (ti) { title = ti[1].trim(); continue; }
+          const ar = line.match(/^\[ar:(.+?)\]$/i);
+          if (ar) { artist = ar[1].trim(); continue; }
+          if (/^\[(al|by|offset):/i.test(line)) continue;
+
+          // Strip LRC timestamps [00:12.34]
+          line = line.replace(/^\s*(\[\d{1,2}:\d{2}(?:\.\d{1,3})?\])+\s*/, '').trim();
+          if (!line) continue;
+
+          const secMatch = line.match(/^\[([^\]]+)\]$/);
+          if (secMatch) {
+            ensureSection(secMatch[1].trim());
+            continue;
+          }
+
+          if ((line.startsWith('>') || line.startsWith('|')) && current && current.lines.length > 0) {
+            const tr = line.slice(1).trim();
+            if (tr) current.lines[current.lines.length - 1].tr = tr;
+            continue;
+          }
+
+          if (!current) ensureSection('Verse 1');
+          current.lines.push({ t: line });
+        }
+
+        const nonEmpty = sections.filter((s) => s.lines.length > 0);
+        return {
+          id: 'song-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6),
+          title,
+          artist: artist || undefined,
+          sections: nonEmpty.length ? nonEmpty : [{ tag: 'Verse 1', singAlong: false, lines: [{ t: '(Chưa có lời)' }] }],
+        };
+      }
+
+      function songToEditableText(song) {
+        return (song.sections || []).map((sec) => {
+          const body = (sec.lines || []).map((l) => l.tr ? `${l.t}\n> ${l.tr}` : l.t).join('\n');
+          return `[${sec.tag}]\n${body}`;
+        }).join('\n\n');
+      }
+
+      function shortTag(tag) {
+        const t = tag.toLowerCase();
+        if (t.includes('pre-chorus') || t.includes('pre chorus')) return 'Pre';
+        if (t.includes('chorus') || t.includes('điệp khúc')) return 'CHORUS';
+        if (t.includes('sing') || t.includes('fanchant')) return 'SING';
+        if (t.includes('verse')) {
+          const num = tag.match(/\d+/);
+          return num ? `V${num[0]}` : 'Verse';
+        }
+        return tag.length > 10 ? tag.slice(0, 10) : tag;
+      }
+
+      // Built-in Seeds (ATVNCG 2026 + Demo)
+      function buildAtvncg2026Setlist() {
+        const mk = (id, title, artist, ch, extra = []) => ({
+          id, title, artist,
+          sections: [
+            { tag: 'Verse 1', singAlong: false, lines: [{ t: `[${ch}]` }, { t: `(Bấm Sửa lời để dán lời bài ${title})` }] },
+            { tag: 'Chorus', singAlong: true, lines: [{ t: `(Điệp khúc ${title} — tự động tô vàng Sing-along)` }] },
+            ...extra,
+          ],
+        });
+        return {
+          v: 1,
+          id: 'atvncg-2026-concert-sample',
+          setlist: 'Concert ATVNCG 2026 (12 Bài Mẫu)',
+          artist: '33 Anh Tài • ATVNCG 2026',
+          songs: [
+            mk('atvncg-01', 'Hỏa Tâm (Mở màn)', '33 Anh Tài', 'Chương 1: Đồng tâm & Hợp lực', [{ tag: 'Sing-along', singAlong: true, lines: [{ t: '(Đoạn hòa giọng khán đài & fanchant)' }] }]),
+            mk('atvncg-02', 'Ngầu Đét', 'Liên minh Kỳ Tích', 'Chương 1: Đồng tâm & Hợp lực'),
+            mk('atvncg-03', 'Thăng Hoa', 'Liên minh Khải Hoàn', 'Chương 1: Đồng tâm & Hợp lực'),
+            mk('atvncg-04', 'Trước Khi Em Tồn Tại', 'ATVNCG 2026', 'Chương 2: Trí tưởng tượng khổng lồ'),
+            mk('atvncg-05', 'Em Chỉ Im Lặng', 'Nhà Chiến Mã', 'Chương 2: Trí tưởng tượng khổng lồ'),
+            mk('atvncg-06', 'Cơm Nhà', 'Liên minh Khải Hoàn', 'Chương 3: Nhỏ xíu'),
+            mk('atvncg-07', 'Trên Đất Mình', 'Liên minh Quý Tử Bềnh Bồng', 'Chương 4: Cội nguồn'),
+            mk('atvncg-08', 'Chim Sáo Ngày Xưa', 'Nhà Chiến Mã', 'Chương 4: Cội nguồn'),
+            mk('atvncg-09', 'Mời Buồn Sang Chơi', 'Nhà Long Mã', 'Chương 5: Mời buồn sang chơi'),
+            mk('atvncg-10', 'Ánh Sáng Của Đời Tôi', 'Nhà Long Mã', 'Chương 5: Mời buồn sang chơi'),
+            mk('atvncg-11', 'Những Năm Tháng Ấy', 'ATVNCG 2026', 'Chương 6: Hit'),
+            mk('atvncg-12', 'Một Đêm Duy Nhất', '33 Anh Tài', 'Chương 7: Mỹ mãn — Kết màn'),
+          ],
+        };
+      }
+
+      function buildDemoSetlist() {
+        return {
+          v: 1,
+          id: 'demo-saigon-night-2026',
+          setlist: 'Đêm Nhạc StageLine (Demo)',
+          artist: 'V-Pop & US-UK Demo',
+          songs: [
+            {
+              id: 'demo-vpop-1',
+              title: 'Đêm Ánh Sáng (Demo V-Pop)',
+              sections: [
+                { tag: 'Verse 1', singAlong: false, lines: [{ t: 'Đèn sân khấu vụt tắt chỉ còn biển sao lung linh' }, { t: 'Hàng ngàn giọng ca chờ khoảnh khắc mình chung nhịp' }] },
+                { tag: 'Pre-Chorus', singAlong: false, lines: [{ t: 'Đếm ba hai một rồi cùng nhau hòa vang' }] },
+                { tag: 'Chorus', singAlong: true, lines: [{ t: 'Hát vang lên nào cho đêm nay không phai' }, { t: 'Giơ cao đôi tay ta cháy hết tuổi trẻ này' }] },
+              ],
+            },
+            {
+              id: 'demo-usuk-2',
+              title: 'City Under Stars (Demo US-UK)',
+              sections: [
+                { tag: 'Verse 1', singAlong: false, lines: [{ t: 'We drove all night just to stand right here', tr: 'Ta lái xe suốt đêm chỉ để đứng nơi đây' }, { t: 'Loud guitars ringing crystal clear', tr: 'Tiếng guitar vang dội thật trong trẻo' }] },
+                { tag: 'Chorus', singAlong: true, lines: [{ t: 'Whoa-oh, sing it back to the stage tonight', tr: 'Whoa-oh, hãy hát vọng lại lên sân khấu đêm nay' }, { t: 'Every voice shining in the stadium light', tr: 'Mọi giọng ca đều tỏa sáng dưới ánh đèn sân vận động' }] },
+              ],
+            },
+          ],
+        };
+      }
+
+      // Render Home
+      function renderHome() {
+        const container = $('setlist-list');
+        if (!state.setlists.length) {
+          container.innerHTML = `
+            <div class="empty">
+              <h2>Sẵn sàng cho đêm concert</h2>
+              <p>Chạy 100% offline ở chế độ máy bay, mượt 120Hz trên iPhone OLED.</p>
+              <div class="btn-stack">
+                <button class="btn-primary" id="empty-atvncg">Nạp Setlist ATVNCG 2026</button>
+                <button class="btn-secondary" id="empty-demo">Nạp Setlist Demo V-Pop &amp; US-UK</button>
+              </div>
+            </div>`;
+          $('empty-atvncg').onclick = () => { saveSetlist(buildAtvncg2026Setlist()); renderHome(); showToast('Đã nạp Setlist ATVNCG 2026'); };
+          $('empty-demo').onclick = () => { saveSetlist(buildDemoSetlist()); renderHome(); showToast('Đã nạp Setlist Demo'); };
+          return;
+        }
+
+        container.innerHTML = '';
+        state.setlists.forEach((sl) => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="card-body">
+              <div class="card-title"></div>
+              <div class="card-sub"></div>
+            </div>
+            ${sl.songs.length ? '<button class="icon-btn gold" data-play>▶</button>' : ''}
+            <button class="icon-btn danger" data-del>✕</button>`;
+          card.querySelector('.card-title').textContent = sl.setlist || 'Setlist';
+          card.querySelector('.card-sub').textContent = [sl.artist, `${sl.songs.length} bài hát`].filter(Boolean).join(' • ');
+          card.querySelector('.card-body').onclick = () => openDetail(sl.id);
+          const playBtn = card.querySelector('[data-play]');
+          if (playBtn) playBtn.onclick = () => openConcert(sl, 0);
+          card.querySelector('[data-del]').onclick = () => {
+            if (confirm(`Xóa "${sl.setlist}" khỏi máy?`)) {
+              deleteSetlist(sl.id);
+              renderHome();
+            }
+          };
+          container.appendChild(card);
+        });
+      }
+
+      // Render Detail
+      function currentSetlist() {
+        return state.setlists.find((s) => s.id === state.currentSetlistId);
+      }
+
+      function openDetail(id) {
+        state.currentSetlistId = id;
+        renderDetail();
+        showScreen('screen-detail');
+      }
+
+      function renderDetail() {
+        const sl = currentSetlist();
+        if (!sl) { showScreen('screen-home'); renderHome(); return; }
+        $('detail-title').textContent = sl.setlist || 'Setlist';
+        $('detail-artist').textContent = sl.artist || '';
+        $('btn-start-concert').classList.toggle('hidden', !sl.songs.length);
+
+        const list = $('song-list');
+        if (!sl.songs.length) {
+          list.innerHTML = '<div class="empty"><p>Chưa có bài hát nào. Bấm "+ Thêm bài" để dán lời.</p></div>';
+          return;
+        }
+        list.innerHTML = '';
+        sl.songs.forEach((song, idx) => {
+          const totalLines = (song.sections || []).reduce((acc, s) => acc + (s.lines || []).length, 0);
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="song-index">${idx + 1}</div>
+            <div class="card-body">
+              <div class="card-title"></div>
+              <div class="card-sub"></div>
+            </div>
+            <button class="icon-btn" data-up title="Lên">↑</button>
+            <button class="icon-btn" data-edit title="Sửa lời">✎</button>
+            <button class="icon-btn danger" data-del title="Xóa">✕</button>`;
+          card.querySelector('.card-title').textContent = song.title;
+          card.querySelector('.card-sub').textContent = `${(song.sections || []).length} đoạn • ${totalLines} dòng`;
+          card.querySelector('.card-body').onclick = () => openConcert(sl, idx);
+          card.querySelector('[data-up]').onclick = () => {
+            if (idx === 0) return;
+            const copy = sl.songs.slice();
+            [copy[idx - 1], copy[idx]] = [copy[idx], copy[idx - 1]];
+            saveSetlist({ ...sl, songs: copy });
+            renderDetail();
+          };
+          card.querySelector('[data-edit]').onclick = () => openEditor(idx);
+          card.querySelector('[data-del]').onclick = () => {
+            const copy = sl.songs.slice();
+            copy.splice(idx, 1);
+            saveSetlist({ ...sl, songs: copy });
+            renderDetail();
+          };
+          list.appendChild(card);
+        });
+      }
+
+      // Quick Editor
+      function openEditor(songIdx) {
+        const sl = currentSetlist();
+        if (!sl) return;
+        state.editingSongIndex = songIdx;
+        if (songIdx >= 0) {
+          const s = sl.songs[songIdx];
+          $('editor-heading').textContent = 'Sửa lời bài hát';
+          $('ed-title').value = s.title || '';
+          $('ed-artist').value = s.artist || '';
+          $('ed-lyrics').value = songToEditableText(s);
+        } else {
+          $('editor-heading').textContent = 'Thêm bài hát mới';
+          $('ed-title').value = '';
+          $('ed-artist').value = '';
+          $('ed-lyrics').value = '';
+        }
+        showScreen('screen-editor');
+      }
+
+      $('tag-chips').addEventListener('click', (e) => {
+        const tag = e.target.getAttribute('data-tag');
+        if (!tag) return;
+        const ta = $('ed-lyrics');
+        const prefix = ta.value && !ta.value.endsWith('\n') ? '\n\n' : '';
+        ta.value += `${prefix}${tag}\n`;
+        ta.focus();
+      });
+
+      $('btn-editor-cancel').onclick = () => showScreen('screen-detail');
+      $('btn-editor-save').onclick = () => {
+        const sl = currentSetlist();
+        if (!sl) return;
+        const title = $('ed-title').value.trim();
+        const artist = $('ed-artist').value.trim();
+        const raw = $('ed-lyrics').value;
+        if (!title) { showToast('Vui lòng nhập tên bài hát'); return; }
+        const parsed = parseLyricsText(raw, title, artist);
+        const songs = sl.songs.slice();
+        if (state.editingSongIndex >= 0) {
+          parsed.id = songs[state.editingSongIndex].id || parsed.id;
+          songs[state.editingSongIndex] = parsed;
+        } else {
+          songs.push(parsed);
+        }
+        saveSetlist({ ...sl, songs });
+        renderDetail();
+        showScreen('screen-detail');
+        showToast('Đã lưu lời bài hát');
+      };
+
+      // Concert Mode
+      async function requestWakeLock() {
+        try {
+          if ('wakeLock' in navigator) {
+            state.wakeLock = await navigator.wakeLock.request('screen');
+          }
+        } catch (_) {}
+      }
+      function releaseWakeLock() {
+        if (state.wakeLock) {
+          state.wakeLock.release().catch(() => {});
+          state.wakeLock = null;
+        }
+      }
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && $('screen-concert').classList.contains('active')) {
+          requestWakeLock();
+        }
+      });
+
+      function openConcert(setlist, songIdx) {
+        if (!setlist.songs.length) return;
+        state.concertSetlist = setlist;
+        state.concertSongIdx = Math.max(0, Math.min(songIdx, setlist.songs.length - 1));
+        state.activeLineIdx = 0;
+        renderConcertSong();
+        showScreen('screen-concert');
+        requestWakeLock();
+      }
+
+      function renderConcertSong() {
+        const sl = state.concertSetlist;
+        const song = sl.songs[state.concertSongIdx];
+        $('concert-song-title').textContent = song.title;
+        $('concert-song-meta').textContent = `${state.concertSongIdx + 1} / ${sl.songs.length}${song.artist ? ' • ' + song.artist : ''}`;
+
+        const pills = $('concert-pills');
+        const scroller = $('lyrics-scroller');
+        pills.innerHTML = '';
+        scroller.innerHTML = '';
+
+        let flatIdx = 0;
+        const sectionStarts = [];
+
+        (song.sections || []).forEach((sec, sIdx) => {
+          sectionStarts.push(flatIdx);
+          const pill = document.createElement('button');
+          pill.className = 'pill' + (sec.singAlong ? ' sing' : '');
+          pill.textContent = shortTag(sec.tag);
+          const jumpTarget = flatIdx;
+          pill.onclick = () => setActiveLine(jumpTarget, true);
+          pills.appendChild(pill);
+
+          const hdr = document.createElement('div');
+          hdr.className = 'section-header' + (sec.singAlong ? ' sing' : '');
+          hdr.textContent = sec.tag;
+          scroller.appendChild(hdr);
+
+          (sec.lines || []).forEach((line) => {
+            const div = document.createElement('div');
+            div.className = 'lyric-line' + (sec.singAlong ? ' sing' : '');
+            div.dataset.idx = flatIdx;
+            div.style.fontSize = state.fontSize + 'px';
+
+            const main = document.createElement('div');
+            main.textContent = line.t;
+            div.appendChild(main);
+
+            if (line.tr && state.showTr) {
+              const tr = document.createElement('div');
+              tr.className = 'lyric-tr';
+              tr.textContent = line.tr;
+              div.appendChild(tr);
+            }
+
+            const targetIdx = flatIdx;
+            div.onclick = (e) => {
+              e.stopPropagation();
+              setActiveLine(targetIdx, true);
+            };
+            scroller.appendChild(div);
+            flatIdx++;
+          });
+        });
+
+        scroller._totalLines = flatIdx;
+        scroller._sectionStarts = sectionStarts;
+        setActiveLine(Math.min(state.activeLineIdx, Math.max(0, flatIdx - 1)), false);
+        scroller.scrollTop = 0;
+      }
+
+      function setActiveLine(idx, shouldScroll) {
+        const scroller = $('lyrics-scroller');
+        const total = scroller._totalLines || 0;
+        if (!total) return;
+        state.activeLineIdx = Math.max(0, Math.min(idx, total - 1));
+
+        const lines = scroller.querySelectorAll('.lyric-line');
+        lines.forEach((el, i) => el.classList.toggle('active', i === state.activeLineIdx));
+
+        const starts = scroller._sectionStarts || [];
+        let activeSec = 0;
+        for (let i = 0; i < starts.length; i++) {
+          if (state.activeLineIdx >= starts[i]) activeSec = i;
+        }
+        $('concert-pills').querySelectorAll('.pill').forEach((p, i) => p.classList.toggle('current', i === activeSec));
+
+        if (shouldScroll && lines[state.activeLineIdx]) {
+          lines[state.activeLineIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+
+      // Tap-to-Advance on empty scroller area (bottom 72% = +1, top 28% = -1)
+      $('lyrics-scroller').addEventListener('click', (e) => {
+        if (e.target.closest('.lyric-line')) return;
+        const rect = $('lyrics-scroller').getBoundingClientRect();
+        const relY = (e.clientY - rect.top) / rect.height;
+        setActiveLine(state.activeLineIdx + (relY < 0.28 ? -1 : 1), true);
+      });
+
+      $('btn-concert-back').onclick = () => {
+        $('dim-slider').value = 0;
+        $('dim-overlay').style.opacity = 0;
+        $('dim-val').textContent = '0%';
+        showScreen(state.currentSetlistId ? 'screen-detail' : 'screen-home');
+      };
+      $('btn-prev-song').onclick = () => {
+        if (!state.concertSetlist || state.concertSongIdx <= 0) return;
+        state.concertSongIdx--;
+        state.activeLineIdx = 0;
+        renderConcertSong();
+      };
+      $('btn-next-song').onclick = () => {
+        if (!state.concertSetlist || state.concertSongIdx >= state.concertSetlist.songs.length - 1) return;
+        state.concertSongIdx++;
+        state.activeLineIdx = 0;
+        renderConcertSong();
+      };
+      $('btn-toggle-hud').onclick = () => {
+        state.hudVisible = !state.hudVisible;
+        $('concert-bottom').classList.toggle('hidden', !state.hudVisible);
+      };
+      $('dim-slider').oninput = (e) => {
+        const val = Number(e.target.value);
+        $('dim-overlay').style.opacity = (val / 100).toFixed(2);
+        $('dim-val').textContent = `${val}%`;
+      };
+      $('btn-font-dec').onclick = () => {
+        state.fontSize = Math.max(16, state.fontSize - 2);
+        renderConcertSong();
+      };
+      $('btn-font-inc').onclick = () => {
+        state.fontSize = Math.min(34, state.fontSize + 2);
+        renderConcertSong();
+      };
+      $('btn-toggle-tr').onclick = () => {
+        state.showTr = !state.showTr;
+        $('btn-toggle-tr').textContent = state.showTr ? 'Dịch: Bật' : 'Dịch: Tắt';
+        renderConcertSong();
+      };
+      $('btn-step-prev').onclick = () => setActiveLine(state.activeLineIdx - 1, true);
+      $('btn-step-next').onclick = () => setActiveLine(state.activeLineIdx + 1, true);
+
+      // Home & Detail Actions
+      $('btn-detail-back').onclick = () => { showScreen('screen-home'); renderHome(); };
+      $('btn-start-concert').onclick = () => { const sl = currentSetlist(); if (sl) openConcert(sl, 0); };
+      $('btn-add-song').onclick = () => openEditor(-1);
+      $('btn-new-setlist').onclick = () => {
+        const title = prompt('Tên Concert / Setlist mới:', 'Concert 2026');
+        if (!title || !title.trim()) return;
+        const artist = prompt('Nghệ sĩ (tùy chọn):', '') || '';
+        const sl = { v: 1, id: 'setlist-' + Date.now().toString(36), setlist: title.trim(), artist: artist.trim(), songs: [] };
+        saveSetlist(sl);
+        openDetail(sl.id);
+      };
+      $('btn-seed-atvncg').onclick = () => {
+        saveSetlist(buildAtvncg2026Setlist());
+        renderHome();
+        showToast('Đã nạp Setlist ATVNCG 2026');
+      };
+      $('btn-export').onclick = () => {
+        const sl = currentSetlist();
+        if (!sl) return;
+        const blob = new Blob([JSON.stringify(sl, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const slug = (sl.setlist || 'stageline').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'stageline';
+        a.href = url;
+        a.download = `${slug}.concert`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast(`Đã xuất ${slug}.concert`);
+      };
+
+      $('btn-import').onclick = () => $('file-input').click();
+      $('file-input').onchange = async (e) => {
+        const file = e.target.files && e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const name = file.name.toLowerCase();
+          if (name.endsWith('.concert') || name.endsWith('.json')) {
+            const parsed = JSON.parse(text.replace(/^\uFEFF/, ''));
+            if (!parsed || parsed.v !== 1 || !Array.isArray(parsed.songs)) {
+              throw new Error('Tệp .concert không đúng định dạng StageLine v1');
+            }
+            saveSetlist(parsed);
+            renderHome();
+            showToast(`Đã nhập "${parsed.setlist}" (${parsed.songs.length} bài)`);
+          } else if (name.endsWith('.lrc') || name.endsWith('.txt')) {
+            const stem = file.name.replace(/\.[^.]+$/, '');
+            const song = parseLyricsText(text, stem, '');
+            const sl = { v: 1, id: 'imp-' + Date.now().toString(36), setlist: song.title, artist: song.artist || '', songs: [song] };
+            saveSetlist(sl);
+            renderHome();
+            showToast(`Đã nhập bài "${song.title}"`);
+          } else {
+            throw new Error('Chỉ hỗ trợ .concert, .json, .lrc hoặc .txt');
+          }
+        } catch (err) {
+          showToast('Lỗi nhập tệp: ' + (err.message || err));
+        }
+      };
+
+      // Init
+      loadSetlists();
+      renderHome();
+    })();
+  </script>
+</body>
+</html>

@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
-    name: Build & Deploy Flutter Web PWA
+  deploy-pwa:
+    name: Deploy Ultra-Slim Offline PWA (55 KB)
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -25,27 +25,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build offline PWA web bundle
-        run: flutter build web --release --base-href /stageline/
-
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
-      - name: Upload Pages artifact
+      - name: Upload PWA artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build/web
+          path: pwa
 
       - name: Deploy to GitHub Pages
         id: deployment
