@@ -565,18 +565,23 @@
       flex: 1;
       position: relative;
       overflow: hidden;
+      touch-action: pan-y;
     }
     .lyrics-scroller {
       width: 100%;
       height: 100%;
       overflow-y: auto;
+      overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
-      padding: 26vh 18px 54vh;
+      touch-action: pan-y;
+      overscroll-behavior-x: none;
+      padding: 42vh 20px 50vh;
       will-change: scroll-position;
     }
     .lyrics-track {
+      width: 100%;
+      overflow-x: hidden;
       will-change: transform, opacity;
-      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
     }
     .lyrics-track.hide-tr .lyric-tr {
       display: none;
@@ -596,19 +601,21 @@
     }
     .lyric-line {
       position: relative;
-      padding: 9px 12px 9px 16px;
-      margin: 5px 0;
+      padding: 10px 18px 10px 16px;
+      margin: 6px 0;
       border-radius: 12px;
       font-size: var(--lyric-size);
       font-weight: 700;
-      line-height: 1.36;
+      line-height: 1.38;
       color: var(--text);
+      word-wrap: break-word;
+      overflow-wrap: break-word;
       transform-origin: left center;
-      transform: translate3d(0, 0, 0) scale(0.985);
-      opacity: 0.36;
+      transform: translate3d(0, 0, 0) scale(0.97);
+      opacity: 0.34;
       contain: layout style;
       will-change: transform, opacity;
-      transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .lyric-line::before {
       content: "";
@@ -622,7 +629,7 @@
       transform: scaleY(0);
       opacity: 0;
       will-change: transform, opacity;
-      transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
     }
     .lyric-line.sing {
       color: var(--gold);
@@ -631,19 +638,19 @@
       background: var(--gold);
     }
     .lyric-line.is-past {
-      transform: translate3d(0, 0, 0) scale(0.975);
+      transform: translate3d(0, 0, 0) scale(0.96);
       opacity: 0.26;
     }
     .lyric-line.is-next {
-      transform: translate3d(0, 0, 0) scale(1);
+      transform: translate3d(0, 0, 0) scale(0.985);
       opacity: 0.66;
     }
     .lyric-line.is-far {
-      transform: translate3d(0, 0, 0) scale(0.98);
-      opacity: 0.36;
+      transform: translate3d(0, 0, 0) scale(0.965);
+      opacity: 0.34;
     }
     .lyric-line.is-active {
-      transform: translate3d(6px, 0, 0) scale(1.045);
+      transform: translate3d(0, 0, 0) scale(1.02);
       opacity: 1;
       background: var(--active);
     }
@@ -858,8 +865,11 @@
         autoScrollOn: false,
         autoScrollRaf: 0,
         autoScrollLastTs: 0,
+        autoScrollOffset: 0,
+        autoScrollMaxOffset: 0,
         speedIdx: 1,
         lineEls: [],
+        lineCenters: [],
         sectionStarts: [],
       };
 
@@ -1456,23 +1466,48 @@
         }
       }
 
-      function smoothScrollToLine(el) {
-        if (!el) return;
+      // Pre-cache exact center Y of every lyric line inside scroller content (zero layout reads during 60fps rAF)
+      function cacheLineCenters() {
+        const scroller = $('lyrics-scroller');
+        const scrollerRect = scroller.getBoundingClientRect();
+        const baseScroll = scroller.scrollTop;
+        state.lineCenters = state.lineEls.map((el) => {
+          const r = el.getBoundingClientRect();
+          return baseScroll + (r.top - scrollerRect.top) + (r.height * 0.5);
+        });
+      }
+
+      function targetScrollForLine(idx) {
+        const scroller = $('lyrics-scroller');
+        if (!state.lineCenters.length) cacheLineCenters();
+        const centerY = state.lineCenters[idx];
+        if (centerY == null) return 0;
+        // Center active line dead-middle of the screen (46% from top)
+        const rawTarget = centerY - scroller.clientHeight * 0.46;
+        const maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+        return Math.max(0, Math.min(rawTarget, maxScroll));
+      }
+
+      function smoothScrollToLine(idx, instant = false) {
         const scroller = $('lyrics-scroller');
         cancelSmoothScroll();
+        commitAutoScrollTransform();
+        const targetY = targetScrollForLine(idx);
+        if (instant) {
+          scroller.scrollTop = targetY;
+          return;
+        }
         const startY = scroller.scrollTop;
-        // Position active line in the natural upper-third (32% from top) like Spotify/Apple Music
-        const targetY = Math.max(0, el.offsetTop - scroller.clientHeight * 0.32);
         const diff = targetY - startY;
         if (Math.abs(diff) < 1) return;
 
-        const duration = 420;
+        const duration = 360;
         const startTime = performance.now();
-        const easeOutQuint = (t) => 1 - Math.pow(1 - t, 5);
+        const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
         const step = (now) => {
           const t = Math.min(1, (now - startTime) / duration);
-          scroller.scrollTop = startY + diff * easeOutQuint(t);
+          scroller.scrollTop = startY + diff * easeOutCubic(t);
           if (t < 1) {
             state.scrollRaf = requestAnimationFrame(step);
           } else {
@@ -1482,33 +1517,78 @@
         state.scrollRaf = requestAnimationFrame(step);
       }
 
-      // Auto-Scroll (60fps rAF delta-time + syncs active Spotify focus line automatically)
+      // GPU sub-pixel Auto-Scroll (uses translate3d on #lyrics-track for silky 60-120fps on iOS Safari with ZERO integer pixel snapping)
       function updateAutoScrollBtn() {
         const btn = $('btn-autoscroll');
         btn.textContent = state.autoScrollOn ? '❚❚ Dừng' : '▶ Tự chạy';
         btn.classList.toggle('active-toggle', state.autoScrollOn);
       }
 
+      function commitAutoScrollTransform() {
+        if (state.autoScrollOffset !== 0) {
+          const scroller = $('lyrics-scroller');
+          const track = $('lyrics-track');
+          const delta = state.autoScrollOffset;
+          state.autoScrollOffset = 0;
+          track.style.transition = 'none';
+          track.style.transform = 'translate3d(0, 0, 0)';
+          scroller.scrollTop = Math.max(0, scroller.scrollTop + delta);
+        }
+      }
+
       function startAutoScroll() {
         if (state.autoScrollOn) return;
         cancelSmoothScroll();
-        state.autoScrollOn = true;
-        state.autoScrollLastTs = performance.now();
-        updateAutoScrollBtn();
+        commitAutoScrollTransform();
+        cacheLineCenters();
 
         const scroller = $('lyrics-scroller');
+        const track = $('lyrics-track');
+        const maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+        state.autoScrollMaxOffset = Math.max(0, maxScroll - scroller.scrollTop);
+        if (state.autoScrollMaxOffset <= 1) return;
+
+        state.autoScrollOn = true;
+        state.autoScrollOffset = 0;
+        state.autoScrollLastTs = performance.now();
+        track.style.transition = 'none';
+        updateAutoScrollBtn();
+
+        const baseScrollTop = scroller.scrollTop;
+        const halfView = scroller.clientHeight * 0.46;
+
         const tick = (now) => {
           if (!state.autoScrollOn) return;
           const dt = Math.min(0.05, (now - state.autoScrollLastTs) / 1000);
           state.autoScrollLastTs = now;
           const speed = SPEEDS[state.speedIdx];
-          const maxScroll = scroller.scrollHeight - scroller.clientHeight;
-          if (scroller.scrollTop >= maxScroll - 1) {
+          state.autoScrollOffset += BASE_AUTOSCROLL_PX_PER_SEC * speed * dt;
+
+          if (state.autoScrollOffset >= state.autoScrollMaxOffset) {
+            state.autoScrollOffset = state.autoScrollMaxOffset;
+            track.style.transform = `translate3d(0, ${-state.autoScrollOffset.toFixed(2)}px, 0)`;
             stopAutoScroll();
             return;
           }
-          scroller.scrollTop += BASE_AUTOSCROLL_PX_PER_SEC * speed * dt;
-          syncActiveLineFromScroll();
+
+          track.style.transform = `translate3d(0, ${-state.autoScrollOffset.toFixed(2)}px, 0)`;
+
+          // Sync active line using pre-cached centers (ZERO DOM reads!)
+          const focusY = baseScrollTop + state.autoScrollOffset + halfView;
+          const centers = state.lineCenters;
+          let best = state.activeLineIdx;
+          let bestDist = Infinity;
+          for (let i = 0; i < centers.length; i++) {
+            const d = Math.abs(centers[i] - focusY);
+            if (d < bestDist) {
+              bestDist = d;
+              best = i;
+            }
+          }
+          if (best !== state.activeLineIdx) {
+            applyActiveLineClasses(best);
+          }
+
           state.autoScrollRaf = requestAnimationFrame(tick);
         };
         state.autoScrollRaf = requestAnimationFrame(tick);
@@ -1521,27 +1601,8 @@
           cancelAnimationFrame(state.autoScrollRaf);
           state.autoScrollRaf = 0;
         }
+        commitAutoScrollTransform();
         updateAutoScrollBtn();
-      }
-
-      function syncActiveLineFromScroll() {
-        const scroller = $('lyrics-scroller');
-        const focusY = scroller.scrollTop + scroller.clientHeight * 0.34;
-        const els = state.lineEls;
-        if (!els.length) return;
-        let best = state.activeLineIdx;
-        let bestDist = Infinity;
-        for (let i = 0; i < els.length; i++) {
-          const mid = els[i].offsetTop + els[i].offsetHeight * 0.5;
-          const d = Math.abs(mid - focusY);
-          if (d < bestDist) {
-            bestDist = d;
-            best = i;
-          }
-        }
-        if (best !== state.activeLineIdx) {
-          applyActiveLineClasses(best);
-        }
       }
 
       function openConcert(setlist, songIdx) {
@@ -1614,25 +1675,27 @@
           });
         });
 
-        // Smooth GPU Slide + Fade when switching songs
+        // Clean fade-in when switching songs (zero horizontal shift to prevent wobble)
+        track.style.transition = 'none';
+        track.style.transform = 'translate3d(0, 0, 0)';
         if (slideDir) {
-          track.style.transition = 'none';
           track.style.opacity = '0';
-          track.style.transform = `translate3d(${slideDir > 0 ? 28 : -28}px, 0, 0)`;
         }
         track.appendChild(frag);
         state.lineEls = lineEls;
+        state.lineCenters = [];
         state.sectionStarts = sectionStarts;
         scroller.scrollTop = 0;
         applyActiveLineClasses(0);
 
-        if (slideDir) {
-          requestAnimationFrame(() => {
-            track.style.transition = 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease';
+        requestAnimationFrame(() => {
+          cacheLineCenters();
+          smoothScrollToLine(0, true);
+          if (slideDir) {
+            track.style.transition = 'opacity 0.22s ease';
             track.style.opacity = '1';
-            track.style.transform = 'translate3d(0, 0, 0)';
-          });
-        }
+          }
+        });
       }
 
       function applyActiveLineClasses(idx) {
@@ -1662,31 +1725,15 @@
       function setActiveLine(idx, shouldScroll) {
         applyActiveLineClasses(idx);
         if (shouldScroll && state.lineEls[state.activeLineIdx]) {
-          smoothScrollToLine(state.lineEls[state.activeLineIdx]);
+          smoothScrollToLine(state.activeLineIdx, false);
         }
       }
 
-      // User manual scroll / swipe gestures
+      // User manual scroll (horizontal swipe-to-change-song disabled to prevent accidental skips)
       const scrollerEl = $('lyrics-scroller');
-      let touchStartX = 0;
-      let touchStartY = 0;
-      scrollerEl.addEventListener('touchstart', (e) => {
+      scrollerEl.addEventListener('touchstart', () => {
         cancelSmoothScroll();
         if (state.autoScrollOn) stopAutoScroll();
-        if (e.touches && e.touches.length === 1) {
-          touchStartX = e.touches[0].clientX;
-          touchStartY = e.touches[0].clientY;
-        }
-      }, { passive: true });
-
-      scrollerEl.addEventListener('touchend', (e) => {
-        if (!e.changedTouches || e.changedTouches.length !== 1) return;
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        const dy = e.changedTouches[0].clientY - touchStartY;
-        if (Math.abs(dx) > 72 && Math.abs(dx) > Math.abs(dy) * 1.6) {
-          if (dx < 0) nextSong();
-          else prevSong();
-        }
       }, { passive: true });
 
       scrollerEl.addEventListener('wheel', () => {
@@ -1743,19 +1790,22 @@
         $('dim-overlay').style.opacity = (val / 100).toFixed(2);
         $('dim-val').textContent = `${val}%`;
       };
-      // Zero-DOM-rebuild CSS var font resize & translation toggle (instant 60fps!)
+      // Zero-DOM-rebuild CSS var font resize & translation toggle (re-caches centers cleanly)
       $('btn-font-dec').onclick = () => {
         state.fontSize = Math.max(16, state.fontSize - 2);
         document.documentElement.style.setProperty('--lyric-size', state.fontSize + 'px');
+        requestAnimationFrame(() => { cacheLineCenters(); smoothScrollToLine(state.activeLineIdx, false); });
       };
       $('btn-font-inc').onclick = () => {
         state.fontSize = Math.min(34, state.fontSize + 2);
         document.documentElement.style.setProperty('--lyric-size', state.fontSize + 'px');
+        requestAnimationFrame(() => { cacheLineCenters(); smoothScrollToLine(state.activeLineIdx, false); });
       };
       $('btn-toggle-tr').onclick = () => {
         state.showTr = !state.showTr;
         $('btn-toggle-tr').textContent = state.showTr ? 'Dịch: Bật' : 'Dịch: Tắt';
         $('lyrics-track').classList.toggle('hide-tr', !state.showTr);
+        requestAnimationFrame(() => { cacheLineCenters(); smoothScrollToLine(state.activeLineIdx, false); });
       };
       $('btn-step-prev').onclick = () => { stopAutoScroll(); setActiveLine(state.activeLineIdx - 1, true); };
       $('btn-step-next').onclick = () => { stopAutoScroll(); setActiveLine(state.activeLineIdx + 1, true); };

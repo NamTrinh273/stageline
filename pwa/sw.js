@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stageline-pwa-v3';
+const CACHE_NAME = 'stageline-pwa-v4';
 const PRECACHE_URLS = [
   './',
   './index.html',
