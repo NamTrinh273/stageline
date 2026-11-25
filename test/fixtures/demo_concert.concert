@@ -1,0 +1,60 @@
+{
+  "v": 1,
+  "id": "demo-saigon-night-2026",
+  "setlist": "Saigon Acoustic & Stadium Night (Demo)",
+  "artist": "StageLine Demo",
+  "updatedAt": "2026-11-25T19:00:00Z",
+  "songs": [
+    {
+      "id": "demo-vpop-1",
+      "title": "Đêm Ánh Sáng (Demo V-Pop)",
+      "sections": [
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "Đèn sân khấu vụt tắt chỉ còn biển sao lung linh" },
+            { "t": "Hàng ngàn giọng ca chờ khoảnh khắc mình chung nhịp" }
+          ]
+        },
+        {
+          "tag": "Pre-Chorus",
+          "singAlong": false,
+          "lines": [
+            { "t": "Đếm ba hai một rồi cùng nhau hòa vang" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "Hát vang lên nào cho đêm nay không phai" },
+            { "t": "Giơ cao đôi tay ta cháy hết tuổi trẻ này" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "demo-usuk-2",
+      "title": "City Under Stars (Demo US-UK)",
+      "sections": [
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "We drove all night just to stand right here", "tr": "Ta lái xe suốt đêm chỉ để đứng nơi đây" },
+            { "t": "Loud guitars ringing crystal clear", "tr": "Tiếng guitar vang dội thật trong trẻo" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "Whoa-oh, sing it back to the stage tonight", "tr": "Whoa-oh, hãy hát vọng lại lên sân khấu đêm nay" },
+            { "t": "Every voice shining in the stadium light", "tr": "Mọi giọng ca đều tỏa sáng dưới ánh đèn sân vận động" }
+          ]
+        }
+      ]
+    }
+  ]
+}

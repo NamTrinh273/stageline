@@ -1,0 +1,314 @@
+{
+  "v": 1,
+  "id": "atvncg-2026-concert-sample",
+  "setlist": "Concert ATVNCG 2026 (Khung Setlist Mẫu)",
+  "artist": "33 Anh Tài • ATVNCG 2026",
+  "updatedAt": "2026-11-25T14:20:00Z",
+  "songs": [
+    {
+      "id": "atvncg26-01-hoa-tam",
+      "title": "Hỏa Tâm (Mở màn)",
+      "artist": "33 Anh Tài",
+      "sections": [
+        {
+          "tag": "Intro",
+          "singAlong": false,
+          "lines": [
+            { "t": "[Chương 1: Đồng tâm & Hợp lực — Ca khúc chủ đề mở màn]" },
+            { "t": "(Bật lightstick — chuẩn bị hô vang cùng 33 Anh Tài)" }
+          ]
+        },
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "(Dán lời Verse 1 của Hỏa Tâm tại nút Sửa lời trong StageLine)" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Dán điệp khúc Hỏa Tâm — đoạn này tự động nổi màu vàng Sing-along)" }
+          ]
+        },
+        {
+          "tag": "Sing-along",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Đoạn hòa giọng khán giả & fanchant cao trào)" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "atvncg26-02-ngau-det",
+      "title": "Ngầu Đét",
+      "artist": "Liên minh Kỳ Tích",
+      "sections": [
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "[Chương 1: Đồng tâm & Hợp lực]" },
+            { "t": "(Dán lời Verse / Rap của Ngầu Đét tại đây)" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Dán đoạn Hook / Chorus sôi động tại đây)" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "atvncg26-03-thang-hoa",
+      "title": "Thăng Hoa",
+      "artist": "Liên minh Khải Hoàn",
+      "sections": [
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "[Chương 1: Đồng tâm & Hợp lực]" },
+            { "t": "(Dán lời Verse 1 của Thăng Hoa tại đây)" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Dán điệp khúc Thăng Hoa để hát theo cùng khán đài)" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "atvncg26-04-truoc-khi-em-ton-tai",
+      "title": "Trước Khi Em Tồn Tại",
+      "artist": "ATVNCG 2026",
+      "sections": [
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "[Chương 2: Trí tưởng tượng khổng lồ — Điểm nhấn sân khấu trên không]" },
+            { "t": "(Dán lời Verse 1 tại đây)" }
+          ]
+        },
+        {
+          "tag": "Pre-Chorus",
+          "singAlong": false,
+          "lines": [
+            { "t": "(Dán đoạn dẫn vào điệp khúc tại đây)" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Dán điệp khúc Trước Khi Em Tồn Tại tại đây)" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "atvncg26-05-em-chi-im-lang",
+      "title": "Em Chỉ Im Lặng",
+      "artist": "Nhà Chiến Mã",
+      "sections": [
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "[Chương 2: Trí tưởng tượng khổng lồ — Sân khấu con thuyền bay]" },
+            { "t": "(Dán lời Verse 1 của Em Chỉ Im Lặng tại đây)" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Dán điệp khúc Em Chỉ Im Lặng tại đây)" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "atvncg26-06-com-nha",
+      "title": "Cơm Nhà",
+      "artist": "Liên minh Khải Hoàn",
+      "sections": [
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "[Chương 3: Nhỏ xíu — Chủ đề Ký ức & Gia đình]" },
+            { "t": "(Dán lời Verse 1 của Cơm Nhà tại đây)" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Dán điệp khúc ấm áp — bật đèn flash/lightstick vẫy chậm)" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "atvncg26-07-tren-dat-minh",
+      "title": "Trên Đất Mình",
+      "artist": "Liên minh Quý Tử Bềnh Bồng",
+      "sections": [
+        {
+          "tag": "Intro",
+          "singAlong": false,
+          "lines": [
+            { "t": "[Chương 4: Cội nguồn — Mở màn câu hò & âm hưởng dân gian]" }
+          ]
+        },
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "(Dán lời Verse 1 & đoạn hò / cải lương tại đây)" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Dán điệp khúc Trên Đất Mình tại đây)" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "atvncg26-08-chim-sao-ngay-xua",
+      "title": "Chim Sáo Ngày Xưa",
+      "artist": "Nhà Chiến Mã",
+      "sections": [
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "[Chương 4: Cội nguồn — Dân gian đương đại]" },
+            { "t": "(Dán lời Verse 1 của Chim Sáo Ngày Xưa tại đây)" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Dán điệp khúc Chim Sáo Ngày Xưa tại đây)" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "atvncg26-09-moi-buon-sang-choi",
+      "title": "Mời Buồn Sang Chơi",
+      "artist": "Nhà Long Mã",
+      "sections": [
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "[Chương 5: Mời buồn sang chơi — Ballad sâu lắng]" },
+            { "t": "(Dán lời Verse 1 tại đây)" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Dán điệp khúc Mời Buồn Sang Chơi tại đây)" }
+          ]
+        },
+        {
+          "tag": "Bridge",
+          "singAlong": false,
+          "lines": [
+            { "t": "(Dán đoạn cao trào Bridge tại đây)" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "atvncg26-10-anh-sang-cua-doi-toi",
+      "title": "Ánh Sáng Của Đời Tôi",
+      "artist": "Nhà Long Mã",
+      "sections": [
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "[Chương 5: Mời buồn sang chơi]" },
+            { "t": "(Dán lời Verse 1 của Ánh Sáng Của Đời Tôi tại đây)" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Dán điệp khúc Ánh Sáng Của Đời Tôi tại đây)" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "atvncg26-11-nhung-nam-thang-ay",
+      "title": "Những Năm Tháng Ấy",
+      "artist": "ATVNCG 2026",
+      "sections": [
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "[Chương 6: Hit — Tương tác gần khán giả]" },
+            { "t": "(Dán lời Verse 1 tại đây)" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Dán điệp khúc Những Năm Tháng Ấy để đồng ca)" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "atvncg26-12-mot-dem-duy-nhat",
+      "title": "Một Đêm Duy Nhất",
+      "artist": "33 Anh Tài",
+      "sections": [
+        {
+          "tag": "Verse 1",
+          "singAlong": false,
+          "lines": [
+            { "t": "[Chương 7: Mỹ mãn — Bùng nổ kết đêm diễn]" },
+            { "t": "(Dán lời Verse 1 của Một Đêm Duy Nhất tại đây)" }
+          ]
+        },
+        {
+          "tag": "Chorus",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Dán điệp khúc Một Đêm Duy Nhất tại đây)" }
+          ]
+        },
+        {
+          "tag": "Sing-along",
+          "singAlong": true,
+          "lines": [
+            { "t": "(Đoạn Encore & Hỏa Tâm kết màn cùng toàn bộ 33 Anh Tài)" }
+          ]
+        }
+      ]
+    }
+  ]
+}
