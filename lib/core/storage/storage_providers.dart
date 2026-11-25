@@ -2,11 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/models.dart';
 import 'concert_repository.dart';
-import 'local_json_concert_repository.dart';
+import 'storage_factory.dart';
 
-/// Provides the offline [ConcertRepository] implementation.
+/// Provides the offline [ConcertRepository] implementation (native JSON files or Web localStorage).
 final concertRepositoryProvider = Provider<ConcertRepository>((ref) {
-  return LocalJsonConcertRepository();
+  return createDefaultConcertRepository();
 });
 
 /// Reactive list of saved concert [Setlist]s backed by [concertRepositoryProvider].

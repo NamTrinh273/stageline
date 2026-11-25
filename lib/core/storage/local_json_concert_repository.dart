@@ -99,7 +99,6 @@ class LocalJsonConcertRepository implements ConcertRepository {
     }
   }
 
-  @override
   Future<File> exportToFile(
     Setlist setlist, {
     required Directory targetDir,
@@ -123,7 +122,6 @@ class LocalJsonConcertRepository implements ConcertRepository {
     return outFile;
   }
 
-  @override
   Future<Setlist> importFromFile(File file) async {
     if (!await file.exists()) {
       throw ConcertFormatException('File not found: ${file.path}');

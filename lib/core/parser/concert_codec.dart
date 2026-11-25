@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 
 import '../models/models.dart';
+import 'gzip_adapter.dart';
 import 'parser_exceptions.dart';
 
 /// Encodes and decodes canonical `.concert` v1 JSON payloads (plain or gzip-compressed).
@@ -26,7 +26,7 @@ class ConcertCodec {
     bool pretty = false,
   }) {
     final utf8Bytes = utf8.encode(encodeSetlist(setlist, pretty: pretty));
-    return compressed ? gzip.encode(utf8Bytes) : utf8Bytes;
+    return compressed ? gzipEncodeBytes(utf8Bytes) : utf8Bytes;
   }
 
   /// Decodes a UTF-8 JSON `.concert` string into a validated [Setlist].
@@ -91,44 +91,8 @@ class ConcertCodec {
   static List<int> boundedGzipDecode(
     List<int> compressedBytes, {
     required int maxBytes,
-  }) {
-    final out = <int>[];
-    final sink = _BoundedByteSink(out, maxBytes: maxBytes);
-    try {
-      final byteSink = gzip.decoder.startChunkedConversion(sink);
-      byteSink.add(compressedBytes);
-      byteSink.close();
-      return out;
-    } on ConcertFormatException {
-      rethrow;
-    } on Object catch (e) {
-      throw ConcertFormatException(
-        'Failed to decompress gzip payload.',
-        cause: e,
-      );
-    }
-  }
+  }) => gzipDecodeBounded(compressedBytes, maxBytes: maxBytes);
 
   static String _stripBom(String input) =>
       input.startsWith('\uFEFF') ? input.substring(1) : input;
-}
-
-class _BoundedByteSink implements Sink<List<int>> {
-  _BoundedByteSink(this._buffer, {required this.maxBytes});
-
-  final List<int> _buffer;
-  final int maxBytes;
-
-  @override
-  void add(List<int> data) {
-    if (_buffer.length + data.length > maxBytes) {
-      throw ConcertFormatException(
-        'Decompressed payload exceeds safety limit of $maxBytes bytes.',
-      );
-    }
-    _buffer.addAll(data);
-  }
-
-  @override
-  void close() {}
 }

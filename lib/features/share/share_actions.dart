@@ -1,14 +1,13 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/models/models.dart';
 import '../../core/parser/parser.dart';
 import '../../core/theme/stageline_theme.dart';
+import 'share_file_adapter.dart';
 
 /// Result of importing a local `.concert`, `.json`, `.lrc`, or `.txt` file.
 sealed class ImportedConcertData {
@@ -46,14 +45,12 @@ class StageLineShareService {
     Rect? sharePositionOrigin,
   }) async {
     final bytes = concertCodec.encodeSetlistBytes(setlist, compressed: false);
-    final tempDir = await getTemporaryDirectory();
     final fileName = '${_slugifyFilename(setlist.title)}.concert';
-    final file = File('${tempDir.path}${Platform.pathSeparator}$fileName');
-    await file.writeAsBytes(bytes, flush: true);
+    final xFile = await createExportXFile(fileName: fileName, bytes: bytes);
 
     await SharePlus.instance.share(
       ShareParams(
-        files: <XFile>[XFile(file.path, name: fileName)],
+        files: <XFile>[xFile],
         subject: setlist.title,
         title: setlist.title,
         sharePositionOrigin: sharePositionOrigin,
@@ -77,9 +74,9 @@ class StageLineShareService {
     try {
       bytes = await picked.readAsBytes();
     } on Object {
-      final path = picked.path;
-      if (path != null && path.isNotEmpty) {
-        bytes = await File(path).readAsBytes();
+      final fallback = await readFallbackFileBytes(picked.path);
+      if (fallback != null) {
+        bytes = fallback;
       } else {
         throw const FormatException(
           'Không thể đọc dữ liệu từ tệp đã chọn. Vui lòng thử lại.',

@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 
 import '../models/models.dart';
 import 'concert_codec.dart';
+import 'gzip_adapter.dart';
 import 'parser_exceptions.dart';
 
 /// Encodes and decodes a single [Song] into a compact `SL1:` Gzip+Base64Url QR payload.
@@ -88,7 +88,7 @@ class QrSongCodec {
 
   String _encodeRaw(Song song) {
     final jsonBytes = utf8.encode(jsonEncode(song.toJson()));
-    final gzipBytes = gzip.encode(jsonBytes);
+    final gzipBytes = gzipEncodeBytes(jsonBytes);
     final b64 = base64Url.encode(gzipBytes).replaceAll('=', '');
     return '$prefix$b64';
   }

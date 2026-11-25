@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -29,16 +27,6 @@ class InMemoryConcertRepository implements ConcertRepository {
   Future<void> delete(String id) async {
     _store.remove(id);
   }
-
-  @override
-  Future<File> exportToFile(
-    Setlist setlist, {
-    required Directory targetDir,
-    bool compressed = false,
-  }) => throw UnimplementedError();
-
-  @override
-  Future<Setlist> importFromFile(File file) => throw UnimplementedError();
 }
 
 void main() {
