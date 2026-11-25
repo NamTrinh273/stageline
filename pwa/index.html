@@ -16,6 +16,7 @@
     :root {
       --bg: #000000;
       --surface: #0E0E12;
+      --surface-2: #15151C;
       --active: #121216;
       --border: #22222A;
       --text: #E2E2E6;
@@ -24,6 +25,7 @@
       --gold: #FFD166;
       --gold-bg: #1B170C;
       --danger: #FF6B6B;
+      --lyric-size: 23px;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
@@ -40,6 +42,7 @@
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
       overscroll-behavior: none;
+      -webkit-font-smoothing: antialiased;
     }
     button, input, textarea {
       font: inherit;
@@ -65,9 +68,9 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: calc(12px + var(--safe-top)) 16px 12px;
+      padding: calc(12px + var(--safe-top)) 16px 10px;
       background: var(--bg);
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid #16161C;
       flex-shrink: 0;
     }
     .topbar-title {
@@ -95,8 +98,8 @@
       margin-right: 6px;
     }
     .icon-btn {
-      min-width: 38px;
-      height: 38px;
+      min-width: 36px;
+      height: 36px;
       border-radius: 10px;
       display: inline-flex;
       align-items: center;
@@ -104,19 +107,26 @@
       background: var(--surface);
       border: 1px solid var(--border);
       color: var(--text);
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       padding: 0 10px;
       flex-shrink: 0;
+      transition: transform 0.12s ease, opacity 0.12s ease;
     }
     .icon-btn:active {
-      opacity: 0.7;
+      transform: scale(0.95);
+      opacity: 0.78;
     }
     .icon-btn.gold {
       background: var(--gold);
       color: #000000;
       border-color: var(--gold);
       font-weight: 700;
+    }
+    .icon-btn.active-toggle {
+      background: var(--gold-bg);
+      color: var(--gold);
+      border-color: rgba(255, 209, 102, 0.55);
     }
     .icon-btn.danger {
       color: var(--danger);
@@ -125,15 +135,116 @@
       flex: 1;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding: 14px 16px calc(92px + var(--safe-bottom));
+      padding: 12px 16px calc(92px + var(--safe-bottom));
     }
+
+    /* Search Bar & Predictive Autocomplete */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0 10px 0 12px;
+      height: 42px;
+    }
+    .search-box:focus-within {
+      border-color: var(--gold);
+    }
+    .search-icon {
+      color: var(--sub);
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .search-input::placeholder {
+      color: var(--sub);
+    }
+    .search-clear {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      color: var(--sub);
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .suggest-list {
+      margin-top: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .suggest-item {
+      width: 100%;
+      text-align: left;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid #181820;
+    }
+    .suggest-item:last-child {
+      border-bottom: none;
+    }
+    .suggest-item:active {
+      background: var(--surface-2);
+    }
+    .suggest-main {
+      flex: 1;
+      min-width: 0;
+    }
+    .suggest-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .suggest-sub {
+      font-size: 12px;
+      color: var(--sub);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .suggest-play {
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .hl {
+      color: var(--gold);
+      font-weight: 800;
+    }
+
     .status-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
       padding: 8px 12px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       border-radius: 10px;
       background: var(--surface);
       border: 1px solid var(--border);
@@ -144,15 +255,21 @@
       color: var(--gold);
       font-weight: 600;
     }
+
+    /* Home Setlist Cards */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 14px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 10px;
+      transition: transform 0.14s ease;
+    }
+    .card:active {
+      transform: scale(0.985);
     }
     .card-body {
       flex: 1;
@@ -171,22 +288,92 @@
       color: var(--sub);
       margin-top: 4px;
     }
-    .song-index {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--active);
-      color: var(--gold);
-      font-size: 12px;
-      font-weight: 700;
+
+    /* Music-App Style 2-Column Song Grid */
+    .song-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .song-tile {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      min-height: 112px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      contain: layout style;
+      transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.14s ease;
+    }
+    .song-tile:active {
+      transform: scale(0.965);
+      border-color: var(--gold);
+    }
+    .tile-top {
       display: flex;
       align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 10px;
     }
+    .tile-num {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--sub);
+      background: var(--active);
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid #1C1C24;
+    }
+    .tile-gold-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: inline-block;
+    }
+    .tile-more {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      color: var(--sub);
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tile-more:active {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+    .tile-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .tile-artist {
+      font-size: 12px;
+      color: var(--sub);
+      margin-top: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .empty {
       text-align: center;
-      padding: 44px 16px;
+      padding: 40px 16px;
     }
     .empty h2 {
       margin: 0 0 8px;
@@ -232,8 +419,53 @@
       font-size: 15px;
       padding: 13px 18px;
       border-radius: 999px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.75);
       z-index: 20;
+    }
+
+    /* Action Sheet Modal */
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 80;
+    }
+    .sheet-backdrop.open {
+      display: flex;
+    }
+    .sheet-panel {
+      width: 100%;
+      max-width: 480px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      padding: 14px 16px calc(18px + var(--safe-bottom));
+    }
+    .sheet-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 10px;
+      padding: 0 4px;
+      color: var(--gold);
+    }
+    .sheet-btn {
+      width: 100%;
+      text-align: left;
+      padding: 13px 12px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      display: block;
+    }
+    .sheet-btn:active {
+      background: var(--surface-2);
+    }
+    .sheet-btn.danger {
+      color: var(--danger);
     }
 
     /* Editor */
@@ -281,7 +513,7 @@
       border-color: rgba(255, 209, 102, 0.45);
     }
 
-    /* Concert Mode */
+    /* CONCERT MODE — 60fps Spotify-Style GPU-Composited Lyrics */
     #screen-concert {
       position: relative;
       user-select: none;
@@ -290,10 +522,10 @@
     .concert-hud-top {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       padding: calc(10px + var(--safe-top)) 12px 8px;
       background: var(--bg);
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid #141418;
       flex-shrink: 0;
     }
     .section-pills {
@@ -317,6 +549,7 @@
       border: 1px solid var(--border);
       color: var(--sub);
       flex-shrink: 0;
+      transition: transform 0.16s ease;
     }
     .pill.sing {
       color: var(--gold);
@@ -326,53 +559,105 @@
       background: var(--gold);
       color: #000000;
       border-color: var(--gold);
+      transform: scale(1.04);
+    }
+    .lyrics-stage {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
     }
     .lyrics-scroller {
-      flex: 1;
+      width: 100%;
+      height: 100%;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding: 28px 16px 46vh;
-      scroll-behavior: smooth;
+      padding: 26vh 18px 54vh;
+      will-change: scroll-position;
+    }
+    .lyrics-track {
+      will-change: transform, opacity;
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
+    }
+    .lyrics-track.hide-tr .lyric-tr {
+      display: none;
     }
     .section-header {
-      margin: 22px 0 8px;
-      font-size: 12px;
+      margin: 26px 0 10px;
+      font-size: 11px;
       font-weight: 800;
-      letter-spacing: 0.8px;
+      letter-spacing: 1px;
       text-transform: uppercase;
       color: var(--sub);
+      opacity: 0.55;
     }
     .section-header.sing {
       color: var(--gold);
+      opacity: 0.85;
     }
     .lyric-line {
-      padding: 10px 14px;
-      margin: 4px 0;
+      position: relative;
+      padding: 9px 12px 9px 16px;
+      margin: 5px 0;
       border-radius: 12px;
-      border-left: 3px solid transparent;
-      color: var(--sub);
-      line-height: 1.38;
-      transition: background-color 0.14s ease, color 0.14s ease;
+      font-size: var(--lyric-size);
+      font-weight: 700;
+      line-height: 1.36;
+      color: var(--text);
+      transform-origin: left center;
+      transform: translate3d(0, 0, 0) scale(0.985);
+      opacity: 0.36;
+      contain: layout style;
+      will-change: transform, opacity;
+      transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .lyric-line::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 10px;
+      bottom: 10px;
+      width: 3px;
+      border-radius: 3px;
+      background: var(--text);
+      transform: scaleY(0);
+      opacity: 0;
+      will-change: transform, opacity;
+      transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease;
     }
     .lyric-line.sing {
-      border-left-color: rgba(255, 209, 102, 0.35);
-      color: rgba(255, 209, 102, 0.72);
-    }
-    .lyric-line.active {
-      background: var(--active);
-      color: var(--text);
-      font-weight: 700;
-      border-left-color: var(--text);
-    }
-    .lyric-line.sing.active {
-      background: var(--gold-bg);
       color: var(--gold);
-      border-left-color: var(--gold);
+    }
+    .lyric-line.sing::before {
+      background: var(--gold);
+    }
+    .lyric-line.is-past {
+      transform: translate3d(0, 0, 0) scale(0.975);
+      opacity: 0.26;
+    }
+    .lyric-line.is-next {
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: 0.66;
+    }
+    .lyric-line.is-far {
+      transform: translate3d(0, 0, 0) scale(0.98);
+      opacity: 0.36;
+    }
+    .lyric-line.is-active {
+      transform: translate3d(6px, 0, 0) scale(1.045);
+      opacity: 1;
+      background: var(--active);
+    }
+    .lyric-line.sing.is-active {
+      background: var(--gold-bg);
+    }
+    .lyric-line.is-active::before {
+      transform: scaleY(1);
+      opacity: 1;
     }
     .lyric-tr {
       margin-top: 4px;
-      font-size: 0.72em;
-      font-weight: 400;
+      font-size: 0.68em;
+      font-weight: 500;
       color: var(--tr);
     }
     .concert-hud-bottom {
@@ -385,7 +670,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
       margin-bottom: 8px;
     }
     .hud-row:last-child { margin-bottom: 0; }
@@ -427,10 +712,18 @@
       <div class="topbar-title">
         <h1><span class="brand-dot">●</span>StageLine</h1>
       </div>
-      <button class="icon-btn" id="btn-import" title="Nhập tệp">Nhập tệp</button>
-      <button class="icon-btn" id="btn-seed-atvncg" title="Nạp ATVNCG 2026">ATVNCG</button>
+      <button class="icon-btn" id="btn-import">Nhập tệp</button>
+      <button class="icon-btn" id="btn-seed-atvncg">ATVNCG</button>
     </header>
     <div class="scroll-area">
+      <div class="search-wrap">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input id="home-search" class="search-input" type="search" autocomplete="off" placeholder="Tìm nhanh tên bài hát, nghệ sĩ...">
+          <button id="home-search-clear" class="search-clear hidden">✕</button>
+        </div>
+        <div id="home-suggest" class="suggest-list hidden"></div>
+      </div>
       <div class="status-bar">
         <span id="offline-status" class="status-badge">Đang lưu offline...</span>
         <span id="net-status"></span>
@@ -441,7 +734,7 @@
     <input type="file" id="file-input" accept=".concert,.json,.lrc,.txt,*/*" class="hidden">
   </section>
 
-  <!-- SETLIST DETAIL SCREEN -->
+  <!-- SETLIST DETAIL SCREEN (MUSIC-APP 2-COL GRID + PREDICTIVE SEARCH) -->
   <section id="screen-detail" class="screen">
     <header class="topbar">
       <button class="icon-btn" id="btn-detail-back">←</button>
@@ -450,11 +743,33 @@
         <div class="sub" id="detail-artist"></div>
       </div>
       <button class="icon-btn" id="btn-export">.concert</button>
-      <button class="icon-btn gold" id="btn-start-concert">▶ Concert</button>
+      <button class="icon-btn gold" id="btn-start-concert">▶</button>
     </header>
-    <div class="scroll-area" id="song-list"></div>
+    <div class="scroll-area">
+      <div class="search-wrap">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input id="detail-search" class="search-input" type="search" autocomplete="off" placeholder="Tìm bài trong setlist này...">
+          <button id="detail-search-clear" class="search-clear hidden">✕</button>
+        </div>
+        <div id="detail-suggest" class="suggest-list hidden"></div>
+      </div>
+      <div id="song-list" class="song-grid"></div>
+    </div>
     <button class="fab" id="btn-add-song">+ Thêm bài</button>
   </section>
+
+  <!-- SONG ACTION SHEET -->
+  <div id="song-sheet" class="sheet-backdrop">
+    <div class="sheet-panel">
+      <div id="sheet-song-title" class="sheet-title">Bài hát</div>
+      <button class="sheet-btn" id="sheet-play">▶ Mở Concert Mode</button>
+      <button class="sheet-btn" id="sheet-edit">✎ Sửa lời bài hát</button>
+      <button class="sheet-btn" id="sheet-up">↑ Đẩy lên trước</button>
+      <button class="sheet-btn" id="sheet-down">↓ Đẩy xuống sau</button>
+      <button class="sheet-btn danger" id="sheet-delete">✕ Xóa bài khỏi setlist</button>
+    </div>
+  </div>
 
   <!-- QUICK LYRICS EDITOR SCREEN -->
   <section id="screen-editor" class="screen">
@@ -470,7 +785,7 @@
       <input id="ed-title" class="input" placeholder="VD: Hỏa Tâm">
       <label class="field-label" for="ed-artist">Nghệ sĩ / Nhà (tùy chọn)</label>
       <input id="ed-artist" class="input" placeholder="VD: 33 Anh Tài">
-      <label class="field-label" for="ed-lyrics">Lời bài hát (dán trực tiếp, hỗ trợ [Chorus], [Sing-along], dòng dịch &gt;)</label>
+      <label class="field-label" for="ed-lyrics">Lời bài hát (hỗ trợ [Chorus], [Sing-along], dòng dịch &gt;)</label>
       <div class="chips" id="tag-chips">
         <button class="chip" data-tag="[Verse 1]">+ [Verse 1]</button>
         <button class="chip" data-tag="[Pre-Chorus]">+ [Pre-Chorus]</button>
@@ -484,7 +799,7 @@
 
   <!-- CONCERT MODE SCREEN -->
   <section id="screen-concert" class="screen">
-    <header class="concert-hud-top" id="concert-top">
+    <header class="concert-hud-top">
       <button class="icon-btn" id="btn-concert-back">←</button>
       <div class="topbar-title">
         <h1 id="concert-song-title">Bài hát</h1>
@@ -495,18 +810,24 @@
       <button class="icon-btn" id="btn-toggle-hud">⚙</button>
     </header>
     <div class="section-pills" id="concert-pills"></div>
-    <div class="lyrics-scroller" id="lyrics-scroller"></div>
+    <div class="lyrics-stage">
+      <div class="lyrics-scroller" id="lyrics-scroller">
+        <div class="lyrics-track" id="lyrics-track"></div>
+      </div>
+    </div>
     <footer class="concert-hud-bottom" id="concert-bottom">
       <div class="hud-row">
-        <span style="font-size:12px;color:var(--sub);">Extra Dim</span>
-        <input id="dim-slider" class="dim-slider" type="range" min="0" max="85" value="0">
-        <span id="dim-val" style="font-size:12px;width:34px;text-align:right;color:var(--gold);">0%</span>
-      </div>
-      <div class="hud-row">
+        <button class="icon-btn" id="btn-autoscroll">▶ Tự chạy</button>
+        <button class="icon-btn" id="btn-speed">1.0x</button>
         <button class="icon-btn" id="btn-font-dec">A-</button>
         <button class="icon-btn" id="btn-font-inc">A+</button>
         <button class="icon-btn" id="btn-toggle-tr">Dịch: Bật</button>
-        <button class="icon-btn" id="btn-step-prev">↑ Lùi</button>
+      </div>
+      <div class="hud-row">
+        <span style="font-size:12px;color:var(--sub);">Dim</span>
+        <input id="dim-slider" class="dim-slider" type="range" min="0" max="85" value="0">
+        <span id="dim-val" style="font-size:12px;width:32px;text-align:right;color:var(--gold);">0%</span>
+        <button class="icon-btn" id="btn-step-prev">↑</button>
         <button class="icon-btn gold" id="btn-step-next">↓ Tiếp</button>
       </div>
     </footer>
@@ -518,17 +839,28 @@
   <script>
     (() => {
       const STORAGE_PREFIX = 'stageline:v1:setlist:';
+      const SPEEDS = [0.7, 1.0, 1.4, 1.8];
+      const BASE_AUTOSCROLL_PX_PER_SEC = 28;
+
       const state = {
         setlists: [],
         currentSetlistId: null,
         editingSongIndex: -1,
+        sheetSongIndex: -1,
         concertSetlist: null,
         concertSongIdx: 0,
         activeLineIdx: 0,
-        fontSize: 22,
+        fontSize: 23,
         showTr: true,
         hudVisible: true,
         wakeLock: null,
+        scrollRaf: 0,
+        autoScrollOn: false,
+        autoScrollRaf: 0,
+        autoScrollLastTs: 0,
+        speedIdx: 1,
+        lineEls: [],
+        sectionStarts: [],
       };
 
       const $ = (id) => document.getElementById(id);
@@ -553,8 +885,6 @@
         }).catch(() => {
           $('offline-status').textContent = 'Lưu offline cục bộ trong Safari';
         });
-      } else {
-        $('offline-status').textContent = 'Lưu offline cục bộ';
       }
 
       const updateNetStatus = () => {
@@ -569,16 +899,122 @@
         el.textContent = msg;
         el.style.display = 'block';
         clearTimeout(el._t);
-        el._t = setTimeout(() => { el.style.display = 'none'; }, 2600);
+        el._t = setTimeout(() => { el.style.display = 'none'; }, 2400);
       }
 
       function showScreen(id) {
         document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
         $(id).classList.add('active');
-        if (id !== 'screen-concert') releaseWakeLock();
+        if (id !== 'screen-concert') {
+          stopAutoScroll();
+          cancelSmoothScroll();
+          releaseWakeLock();
+        }
       }
 
-      // Storage (exact .concert v1 schema compatible with Android/iOS Flutter app)
+      // Vietnamese diacritic-insensitive search helpers
+      function normText(str) {
+        return (str || '')
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/đ/g, 'd')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      function escapeHtml(s) {
+        return (s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      }
+
+      function highlightMatch(raw, query) {
+        const nq = normText(query);
+        if (!nq) return escapeHtml(raw);
+        const chars = Array.from(raw);
+        let normStr = '';
+        const map = [];
+        for (let i = 0; i < chars.length; i++) {
+          const piece = normText(chars[i]);
+          for (let j = 0; j < piece.length; j++) {
+            normStr += piece[j];
+            map.push(i);
+          }
+        }
+        const idx = normStr.indexOf(nq);
+        if (idx < 0) return escapeHtml(raw);
+        const start = map[idx];
+        const end = map[Math.min(idx + nq.length - 1, map.length - 1)] + 1;
+        return escapeHtml(chars.slice(0, start).join('')) +
+          `<span class="hl">${escapeHtml(chars.slice(start, end).join(''))}</span>` +
+          escapeHtml(chars.slice(end).join(''));
+      }
+
+      function searchSongs(query, scopeSetlist) {
+        const q = normText(query);
+        if (!q) return [];
+        const pools = scopeSetlist ? [scopeSetlist] : state.setlists;
+        const hits = [];
+
+        pools.forEach((sl) => {
+          (sl.songs || []).forEach((song, songIdx) => {
+            const nt = normText(song.title);
+            const na = normText(song.artist || sl.artist || '');
+            let score = 0;
+            if (nt.startsWith(q)) score = 100;
+            else if (nt.includes(q)) score = 75;
+            else if (na.includes(q)) score = 50;
+            else {
+              const firstLyricMatch = (song.sections || []).some((sec) =>
+                (sec.lines || []).some((l) => normText(l.t).includes(q))
+              );
+              if (firstLyricMatch) score = 25;
+            }
+            if (score > 0) {
+              hits.push({ score, setlist: sl, song, songIdx });
+            }
+          });
+        });
+
+        hits.sort((a, b) => b.score - a.score || a.song.title.localeCompare(b.song.title));
+        return hits.slice(0, 6);
+      }
+
+      function renderSuggestions(listEl, hits, query, showSetlistName) {
+        if (!query.trim()) {
+          listEl.classList.add('hidden');
+          listEl.innerHTML = '';
+          return;
+        }
+        if (!hits.length) {
+          listEl.innerHTML = '<div class="suggest-item"><div class="suggest-sub">Không tìm thấy bài hát phù hợp</div></div>';
+          listEl.classList.remove('hidden');
+          return;
+        }
+        listEl.innerHTML = '';
+        hits.forEach((hit) => {
+          const btn = document.createElement('button');
+          btn.className = 'suggest-item';
+          const artist = hit.song.artist || hit.setlist.artist || '';
+          const subText = showSetlistName
+            ? [artist, hit.setlist.setlist].filter(Boolean).join(' • ')
+            : (artist || `${(hit.song.sections || []).length} đoạn`);
+          btn.innerHTML = `
+            <div class="suggest-main">
+              <div class="suggest-title">${highlightMatch(hit.song.title, query)}</div>
+              <div class="suggest-sub">${highlightMatch(subText, query)}</div>
+            </div>
+            <span class="suggest-play">▶ Hát</span>`;
+          btn.onclick = () => {
+            listEl.classList.add('hidden');
+            state.currentSetlistId = hit.setlist.id;
+            openConcert(hit.setlist, hit.songIdx);
+          };
+          listEl.appendChild(btn);
+        });
+        listEl.classList.remove('hidden');
+      }
+
+      // Storage (.concert v1 compatible)
       function loadSetlists() {
         const out = [];
         for (let i = 0; i < localStorage.length; i++) {
@@ -607,7 +1043,7 @@
         loadSetlists();
       }
 
-      // Parser (.txt / .lrc -> Song)
+      // Parser
       function isSingAlongTag(tag) {
         const t = tag.toLowerCase();
         if (t.includes('pre-chorus') || t.includes('pre chorus')) return false;
@@ -629,29 +1065,20 @@
         for (let rawLine of lines) {
           let line = rawLine.trim();
           if (!line) continue;
-
           const ti = line.match(/^\[ti:(.+?)\]$/i);
           if (ti) { title = ti[1].trim(); continue; }
           const ar = line.match(/^\[ar:(.+?)\]$/i);
           if (ar) { artist = ar[1].trim(); continue; }
           if (/^\[(al|by|offset):/i.test(line)) continue;
-
-          // Strip LRC timestamps [00:12.34]
           line = line.replace(/^\s*(\[\d{1,2}:\d{2}(?:\.\d{1,3})?\])+\s*/, '').trim();
           if (!line) continue;
-
           const secMatch = line.match(/^\[([^\]]+)\]$/);
-          if (secMatch) {
-            ensureSection(secMatch[1].trim());
-            continue;
-          }
-
+          if (secMatch) { ensureSection(secMatch[1].trim()); continue; }
           if ((line.startsWith('>') || line.startsWith('|')) && current && current.lines.length > 0) {
             const tr = line.slice(1).trim();
             if (tr) current.lines[current.lines.length - 1].tr = tr;
             continue;
           }
-
           if (!current) ensureSection('Verse 1');
           current.lines.push({ t: line });
         }
@@ -684,12 +1111,12 @@
         return tag.length > 10 ? tag.slice(0, 10) : tag;
       }
 
-      // Built-in Seeds (ATVNCG 2026 + Demo)
+      // Seeds
       function buildAtvncg2026Setlist() {
         const mk = (id, title, artist, ch, extra = []) => ({
           id, title, artist,
           sections: [
-            { tag: 'Verse 1', singAlong: false, lines: [{ t: `[${ch}]` }, { t: `(Bấm Sửa lời để dán lời bài ${title})` }] },
+            { tag: 'Verse 1', singAlong: false, lines: [{ t: `[${ch}]` }, { t: `(Bấm ⋯ → Sửa lời để dán lời bài ${title})` }] },
             { tag: 'Chorus', singAlong: true, lines: [{ t: `(Điệp khúc ${title} — tự động tô vàng Sing-along)` }] },
             ...extra,
           ],
@@ -725,33 +1152,63 @@
           songs: [
             {
               id: 'demo-vpop-1',
-              title: 'Đêm Ánh Sáng (Demo V-Pop)',
+              title: 'Đêm Ánh Sáng',
+              artist: 'StageLine V-Pop Demo',
               sections: [
-                { tag: 'Verse 1', singAlong: false, lines: [{ t: 'Đèn sân khấu vụt tắt chỉ còn biển sao lung linh' }, { t: 'Hàng ngàn giọng ca chờ khoảnh khắc mình chung nhịp' }] },
-                { tag: 'Pre-Chorus', singAlong: false, lines: [{ t: 'Đếm ba hai một rồi cùng nhau hòa vang' }] },
-                { tag: 'Chorus', singAlong: true, lines: [{ t: 'Hát vang lên nào cho đêm nay không phai' }, { t: 'Giơ cao đôi tay ta cháy hết tuổi trẻ này' }] },
+                { tag: 'Verse 1', singAlong: false, lines: [
+                  { t: 'Đèn sân khấu vụt tắt chỉ còn biển sao lung linh' },
+                  { t: 'Hàng ngàn giọng ca chờ khoảnh khắc mình chung nhịp' },
+                  { t: 'Gió đêm ùa qua mang theo thanh âm rực cháy' },
+                ]},
+                { tag: 'Pre-Chorus', singAlong: false, lines: [
+                  { t: 'Đếm ba hai một rồi cùng nhau hòa vang' },
+                  { t: 'Bật cao ánh sáng lên bầu trời đêm nay' },
+                ]},
+                { tag: 'Chorus', singAlong: true, lines: [
+                  { t: 'Hát vang lên nào cho đêm nay không phai' },
+                  { t: 'Giơ cao đôi tay ta cháy hết tuổi trẻ này' },
+                  { t: 'Ngàn tim chung nhịp vang vọng giữa sân vận động' },
+                ]},
               ],
             },
             {
               id: 'demo-usuk-2',
-              title: 'City Under Stars (Demo US-UK)',
+              title: 'City Under Stars',
+              artist: 'StageLine US-UK Demo',
               sections: [
-                { tag: 'Verse 1', singAlong: false, lines: [{ t: 'We drove all night just to stand right here', tr: 'Ta lái xe suốt đêm chỉ để đứng nơi đây' }, { t: 'Loud guitars ringing crystal clear', tr: 'Tiếng guitar vang dội thật trong trẻo' }] },
-                { tag: 'Chorus', singAlong: true, lines: [{ t: 'Whoa-oh, sing it back to the stage tonight', tr: 'Whoa-oh, hãy hát vọng lại lên sân khấu đêm nay' }, { t: 'Every voice shining in the stadium light', tr: 'Mọi giọng ca đều tỏa sáng dưới ánh đèn sân vận động' }] },
+                { tag: 'Verse 1', singAlong: false, lines: [
+                  { t: 'We drove all night just to stand right here', tr: 'Ta lái xe suốt đêm chỉ để đứng nơi đây' },
+                  { t: 'Loud guitars ringing crystal clear', tr: 'Tiếng guitar vang dội thật trong trẻo' },
+                ]},
+                { tag: 'Chorus', singAlong: true, lines: [
+                  { t: 'Whoa-oh, sing it back to the stage tonight', tr: 'Whoa-oh, hãy hát vọng lại lên sân khấu đêm nay' },
+                  { t: 'Every voice shining in the stadium light', tr: 'Mọi giọng ca đều tỏa sáng dưới ánh đèn sân vận động' },
+                ]},
               ],
             },
           ],
         };
       }
 
-      // Render Home
+      // Home Search & Render
+      $('home-search').addEventListener('input', (e) => {
+        const q = e.target.value;
+        $('home-search-clear').classList.toggle('hidden', !q);
+        renderSuggestions($('home-suggest'), searchSongs(q, null), q, true);
+      });
+      $('home-search-clear').onclick = () => {
+        $('home-search').value = '';
+        $('home-search-clear').classList.add('hidden');
+        $('home-suggest').classList.add('hidden');
+      };
+
       function renderHome() {
         const container = $('setlist-list');
         if (!state.setlists.length) {
           container.innerHTML = `
             <div class="empty">
               <h2>Sẵn sàng cho đêm concert</h2>
-              <p>Chạy 100% offline ở chế độ máy bay, mượt 120Hz trên iPhone OLED.</p>
+              <p>Chạy 100% offline ở chế độ máy bay, mượt 60fps chuẩn Spotify trên iPhone OLED.</p>
               <div class="btn-stack">
                 <button class="btn-primary" id="empty-atvncg">Nạp Setlist ATVNCG 2026</button>
                 <button class="btn-secondary" id="empty-demo">Nạp Setlist Demo V-Pop &amp; US-UK</button>
@@ -788,63 +1245,140 @@
         });
       }
 
-      // Render Detail
+      // Detail Screen (2-Column Music-App Grid + Predictive Search)
       function currentSetlist() {
         return state.setlists.find((s) => s.id === state.currentSetlistId);
       }
 
       function openDetail(id) {
         state.currentSetlistId = id;
+        $('detail-search').value = '';
+        $('detail-search-clear').classList.add('hidden');
+        $('detail-suggest').classList.add('hidden');
         renderDetail();
         showScreen('screen-detail');
       }
 
-      function renderDetail() {
+      $('detail-search').addEventListener('input', (e) => {
+        const q = e.target.value;
+        $('detail-search-clear').classList.toggle('hidden', !q);
+        const sl = currentSetlist();
+        if (!sl) return;
+        renderSuggestions($('detail-suggest'), searchSongs(q, sl), q, false);
+        renderDetail(q);
+      });
+      $('detail-search-clear').onclick = () => {
+        $('detail-search').value = '';
+        $('detail-search-clear').classList.add('hidden');
+        $('detail-suggest').classList.add('hidden');
+        renderDetail('');
+      };
+
+      function renderDetail(filterQuery = '') {
         const sl = currentSetlist();
         if (!sl) { showScreen('screen-home'); renderHome(); return; }
         $('detail-title').textContent = sl.setlist || 'Setlist';
-        $('detail-artist').textContent = sl.artist || '';
+        $('detail-artist').textContent = [sl.artist, `${sl.songs.length} bài`].filter(Boolean).join(' • ');
         $('btn-start-concert').classList.toggle('hidden', !sl.songs.length);
 
         const list = $('song-list');
         if (!sl.songs.length) {
+          list.className = '';
           list.innerHTML = '<div class="empty"><p>Chưa có bài hát nào. Bấm "+ Thêm bài" để dán lời.</p></div>';
           return;
         }
+
+        const nq = normText(filterQuery);
+        const items = sl.songs
+          .map((song, idx) => ({ song, idx }))
+          .filter(({ song }) => !nq || normText(song.title).includes(nq) || normText(song.artist || sl.artist || '').includes(nq));
+
+        if (!items.length) {
+          list.className = '';
+          list.innerHTML = '<div class="empty"><p>Không có bài nào khớp từ khóa.</p></div>';
+          return;
+        }
+
+        list.className = 'song-grid';
         list.innerHTML = '';
-        sl.songs.forEach((song, idx) => {
-          const totalLines = (song.sections || []).reduce((acc, s) => acc + (s.lines || []).length, 0);
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <div class="song-index">${idx + 1}</div>
-            <div class="card-body">
-              <div class="card-title"></div>
-              <div class="card-sub"></div>
+        items.forEach(({ song, idx }) => {
+          const hasSing = (song.sections || []).some((s) => s.singAlong);
+          const tile = document.createElement('div');
+          tile.className = 'song-tile';
+          tile.innerHTML = `
+            <div class="tile-top">
+              <span class="tile-num">${String(idx + 1).padStart(2, '0')}${hasSing ? '<span class="tile-gold-dot"></span>' : ''}</span>
+              <button class="tile-more" data-more aria-label="Tùy chọn">⋯</button>
             </div>
-            <button class="icon-btn" data-up title="Lên">↑</button>
-            <button class="icon-btn" data-edit title="Sửa lời">✎</button>
-            <button class="icon-btn danger" data-del title="Xóa">✕</button>`;
-          card.querySelector('.card-title').textContent = song.title;
-          card.querySelector('.card-sub').textContent = `${(song.sections || []).length} đoạn • ${totalLines} dòng`;
-          card.querySelector('.card-body').onclick = () => openConcert(sl, idx);
-          card.querySelector('[data-up]').onclick = () => {
-            if (idx === 0) return;
-            const copy = sl.songs.slice();
-            [copy[idx - 1], copy[idx]] = [copy[idx], copy[idx - 1]];
-            saveSetlist({ ...sl, songs: copy });
-            renderDetail();
+            <div>
+              <div class="tile-title"></div>
+              <div class="tile-artist"></div>
+            </div>`;
+          tile.querySelector('.tile-title').textContent = song.title;
+          tile.querySelector('.tile-artist').textContent = song.artist || sl.artist || `${(song.sections || []).length} đoạn`;
+          tile.onclick = (e) => {
+            if (e.target.closest('[data-more]')) return;
+            openConcert(sl, idx);
           };
-          card.querySelector('[data-edit]').onclick = () => openEditor(idx);
-          card.querySelector('[data-del]').onclick = () => {
-            const copy = sl.songs.slice();
-            copy.splice(idx, 1);
-            saveSetlist({ ...sl, songs: copy });
-            renderDetail();
+          tile.querySelector('[data-more]').onclick = (e) => {
+            e.stopPropagation();
+            openSongSheet(idx);
           };
-          list.appendChild(card);
+          list.appendChild(tile);
         });
       }
+
+      // Song Action Sheet
+      function openSongSheet(idx) {
+        const sl = currentSetlist();
+        if (!sl || !sl.songs[idx]) return;
+        state.sheetSongIndex = idx;
+        $('sheet-song-title').textContent = sl.songs[idx].title;
+        $('song-sheet').classList.add('open');
+      }
+      function closeSongSheet() {
+        $('song-sheet').classList.remove('open');
+      }
+      $('song-sheet').onclick = (e) => { if (e.target === $('song-sheet')) closeSongSheet(); };
+      $('sheet-play').onclick = () => {
+        const sl = currentSetlist();
+        closeSongSheet();
+        if (sl) openConcert(sl, state.sheetSongIndex);
+      };
+      $('sheet-edit').onclick = () => {
+        closeSongSheet();
+        openEditor(state.sheetSongIndex);
+      };
+      $('sheet-up').onclick = () => {
+        const sl = currentSetlist();
+        const i = state.sheetSongIndex;
+        closeSongSheet();
+        if (!sl || i <= 0) return;
+        const copy = sl.songs.slice();
+        [copy[i - 1], copy[i]] = [copy[i], copy[i - 1]];
+        saveSetlist({ ...sl, songs: copy });
+        renderDetail($('detail-search').value);
+      };
+      $('sheet-down').onclick = () => {
+        const sl = currentSetlist();
+        const i = state.sheetSongIndex;
+        closeSongSheet();
+        if (!sl || i < 0 || i >= sl.songs.length - 1) return;
+        const copy = sl.songs.slice();
+        [copy[i], copy[i + 1]] = [copy[i + 1], copy[i]];
+        saveSetlist({ ...sl, songs: copy });
+        renderDetail($('detail-search').value);
+      };
+      $('sheet-delete').onclick = () => {
+        const sl = currentSetlist();
+        const i = state.sheetSongIndex;
+        closeSongSheet();
+        if (!sl || i < 0) return;
+        const copy = sl.songs.slice();
+        copy.splice(i, 1);
+        saveSetlist({ ...sl, songs: copy });
+        renderDetail($('detail-search').value);
+      };
 
       // Quick Editor
       function openEditor(songIdx) {
@@ -892,17 +1426,15 @@
           songs.push(parsed);
         }
         saveSetlist({ ...sl, songs });
-        renderDetail();
+        renderDetail($('detail-search').value);
         showScreen('screen-detail');
         showToast('Đã lưu lời bài hát');
       };
 
-      // Concert Mode
+      // CONCERT MODE: 60fps Custom Spring/EaseOutQuint Scroll + Spotify Depth Focus + Auto-Scroll
       async function requestWakeLock() {
         try {
-          if ('wakeLock' in navigator) {
-            state.wakeLock = await navigator.wakeLock.request('screen');
-          }
+          if ('wakeLock' in navigator) state.wakeLock = await navigator.wakeLock.request('screen');
         } catch (_) {}
       }
       function releaseWakeLock() {
@@ -917,105 +1449,274 @@
         }
       });
 
+      function cancelSmoothScroll() {
+        if (state.scrollRaf) {
+          cancelAnimationFrame(state.scrollRaf);
+          state.scrollRaf = 0;
+        }
+      }
+
+      function smoothScrollToLine(el) {
+        if (!el) return;
+        const scroller = $('lyrics-scroller');
+        cancelSmoothScroll();
+        const startY = scroller.scrollTop;
+        // Position active line in the natural upper-third (32% from top) like Spotify/Apple Music
+        const targetY = Math.max(0, el.offsetTop - scroller.clientHeight * 0.32);
+        const diff = targetY - startY;
+        if (Math.abs(diff) < 1) return;
+
+        const duration = 420;
+        const startTime = performance.now();
+        const easeOutQuint = (t) => 1 - Math.pow(1 - t, 5);
+
+        const step = (now) => {
+          const t = Math.min(1, (now - startTime) / duration);
+          scroller.scrollTop = startY + diff * easeOutQuint(t);
+          if (t < 1) {
+            state.scrollRaf = requestAnimationFrame(step);
+          } else {
+            state.scrollRaf = 0;
+          }
+        };
+        state.scrollRaf = requestAnimationFrame(step);
+      }
+
+      // Auto-Scroll (60fps rAF delta-time + syncs active Spotify focus line automatically)
+      function updateAutoScrollBtn() {
+        const btn = $('btn-autoscroll');
+        btn.textContent = state.autoScrollOn ? '❚❚ Dừng' : '▶ Tự chạy';
+        btn.classList.toggle('active-toggle', state.autoScrollOn);
+      }
+
+      function startAutoScroll() {
+        if (state.autoScrollOn) return;
+        cancelSmoothScroll();
+        state.autoScrollOn = true;
+        state.autoScrollLastTs = performance.now();
+        updateAutoScrollBtn();
+
+        const scroller = $('lyrics-scroller');
+        const tick = (now) => {
+          if (!state.autoScrollOn) return;
+          const dt = Math.min(0.05, (now - state.autoScrollLastTs) / 1000);
+          state.autoScrollLastTs = now;
+          const speed = SPEEDS[state.speedIdx];
+          const maxScroll = scroller.scrollHeight - scroller.clientHeight;
+          if (scroller.scrollTop >= maxScroll - 1) {
+            stopAutoScroll();
+            return;
+          }
+          scroller.scrollTop += BASE_AUTOSCROLL_PX_PER_SEC * speed * dt;
+          syncActiveLineFromScroll();
+          state.autoScrollRaf = requestAnimationFrame(tick);
+        };
+        state.autoScrollRaf = requestAnimationFrame(tick);
+      }
+
+      function stopAutoScroll() {
+        if (!state.autoScrollOn) return;
+        state.autoScrollOn = false;
+        if (state.autoScrollRaf) {
+          cancelAnimationFrame(state.autoScrollRaf);
+          state.autoScrollRaf = 0;
+        }
+        updateAutoScrollBtn();
+      }
+
+      function syncActiveLineFromScroll() {
+        const scroller = $('lyrics-scroller');
+        const focusY = scroller.scrollTop + scroller.clientHeight * 0.34;
+        const els = state.lineEls;
+        if (!els.length) return;
+        let best = state.activeLineIdx;
+        let bestDist = Infinity;
+        for (let i = 0; i < els.length; i++) {
+          const mid = els[i].offsetTop + els[i].offsetHeight * 0.5;
+          const d = Math.abs(mid - focusY);
+          if (d < bestDist) {
+            bestDist = d;
+            best = i;
+          }
+        }
+        if (best !== state.activeLineIdx) {
+          applyActiveLineClasses(best);
+        }
+      }
+
       function openConcert(setlist, songIdx) {
         if (!setlist.songs.length) return;
+        stopAutoScroll();
         state.concertSetlist = setlist;
         state.concertSongIdx = Math.max(0, Math.min(songIdx, setlist.songs.length - 1));
         state.activeLineIdx = 0;
-        renderConcertSong();
+        renderConcertSong(0);
         showScreen('screen-concert');
         requestWakeLock();
       }
 
-      function renderConcertSong() {
+      function renderConcertSong(slideDir) {
         const sl = state.concertSetlist;
         const song = sl.songs[state.concertSongIdx];
         $('concert-song-title').textContent = song.title;
         $('concert-song-meta').textContent = `${state.concertSongIdx + 1} / ${sl.songs.length}${song.artist ? ' • ' + song.artist : ''}`;
 
         const pills = $('concert-pills');
+        const track = $('lyrics-track');
         const scroller = $('lyrics-scroller');
         pills.innerHTML = '';
-        scroller.innerHTML = '';
+        track.innerHTML = '';
+        track.classList.toggle('hide-tr', !state.showTr);
 
-        let flatIdx = 0;
+        const frag = document.createDocumentFragment();
+        const lineEls = [];
         const sectionStarts = [];
+        let flatIdx = 0;
 
-        (song.sections || []).forEach((sec, sIdx) => {
+        (song.sections || []).forEach((sec) => {
           sectionStarts.push(flatIdx);
           const pill = document.createElement('button');
           pill.className = 'pill' + (sec.singAlong ? ' sing' : '');
           pill.textContent = shortTag(sec.tag);
           const jumpTarget = flatIdx;
-          pill.onclick = () => setActiveLine(jumpTarget, true);
+          pill.onclick = () => {
+            stopAutoScroll();
+            setActiveLine(jumpTarget, true);
+          };
           pills.appendChild(pill);
 
           const hdr = document.createElement('div');
           hdr.className = 'section-header' + (sec.singAlong ? ' sing' : '');
           hdr.textContent = sec.tag;
-          scroller.appendChild(hdr);
+          frag.appendChild(hdr);
 
           (sec.lines || []).forEach((line) => {
             const div = document.createElement('div');
             div.className = 'lyric-line' + (sec.singAlong ? ' sing' : '');
-            div.dataset.idx = flatIdx;
-            div.style.fontSize = state.fontSize + 'px';
-
             const main = document.createElement('div');
             main.textContent = line.t;
             div.appendChild(main);
-
-            if (line.tr && state.showTr) {
+            if (line.tr) {
               const tr = document.createElement('div');
               tr.className = 'lyric-tr';
               tr.textContent = line.tr;
               div.appendChild(tr);
             }
-
             const targetIdx = flatIdx;
             div.onclick = (e) => {
               e.stopPropagation();
+              stopAutoScroll();
               setActiveLine(targetIdx, true);
             };
-            scroller.appendChild(div);
+            frag.appendChild(div);
+            lineEls.push(div);
             flatIdx++;
           });
         });
 
-        scroller._totalLines = flatIdx;
-        scroller._sectionStarts = sectionStarts;
-        setActiveLine(Math.min(state.activeLineIdx, Math.max(0, flatIdx - 1)), false);
+        // Smooth GPU Slide + Fade when switching songs
+        if (slideDir) {
+          track.style.transition = 'none';
+          track.style.opacity = '0';
+          track.style.transform = `translate3d(${slideDir > 0 ? 28 : -28}px, 0, 0)`;
+        }
+        track.appendChild(frag);
+        state.lineEls = lineEls;
+        state.sectionStarts = sectionStarts;
         scroller.scrollTop = 0;
+        applyActiveLineClasses(0);
+
+        if (slideDir) {
+          requestAnimationFrame(() => {
+            track.style.transition = 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease';
+            track.style.opacity = '1';
+            track.style.transform = 'translate3d(0, 0, 0)';
+          });
+        }
       }
 
-      function setActiveLine(idx, shouldScroll) {
-        const scroller = $('lyrics-scroller');
-        const total = scroller._totalLines || 0;
-        if (!total) return;
-        state.activeLineIdx = Math.max(0, Math.min(idx, total - 1));
+      function applyActiveLineClasses(idx) {
+        const els = state.lineEls;
+        if (!els.length) return;
+        state.activeLineIdx = Math.max(0, Math.min(idx, els.length - 1));
+        for (let i = 0; i < els.length; i++) {
+          const el = els[i];
+          el.classList.remove('is-active', 'is-next', 'is-past', 'is-far');
+          if (i === state.activeLineIdx) el.classList.add('is-active');
+          else if (i === state.activeLineIdx + 1) el.classList.add('is-next');
+          else if (i < state.activeLineIdx) el.classList.add('is-past');
+          else el.classList.add('is-far');
+        }
 
-        const lines = scroller.querySelectorAll('.lyric-line');
-        lines.forEach((el, i) => el.classList.toggle('active', i === state.activeLineIdx));
-
-        const starts = scroller._sectionStarts || [];
+        const starts = state.sectionStarts;
         let activeSec = 0;
         for (let i = 0; i < starts.length; i++) {
           if (state.activeLineIdx >= starts[i]) activeSec = i;
         }
-        $('concert-pills').querySelectorAll('.pill').forEach((p, i) => p.classList.toggle('current', i === activeSec));
-
-        if (shouldScroll && lines[state.activeLineIdx]) {
-          lines[state.activeLineIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const pillEls = $('concert-pills').children;
+        for (let i = 0; i < pillEls.length; i++) {
+          pillEls[i].classList.toggle('current', i === activeSec);
         }
       }
 
-      // Tap-to-Advance on empty scroller area (bottom 72% = +1, top 28% = -1)
-      $('lyrics-scroller').addEventListener('click', (e) => {
+      function setActiveLine(idx, shouldScroll) {
+        applyActiveLineClasses(idx);
+        if (shouldScroll && state.lineEls[state.activeLineIdx]) {
+          smoothScrollToLine(state.lineEls[state.activeLineIdx]);
+        }
+      }
+
+      // User manual scroll / swipe gestures
+      const scrollerEl = $('lyrics-scroller');
+      let touchStartX = 0;
+      let touchStartY = 0;
+      scrollerEl.addEventListener('touchstart', (e) => {
+        cancelSmoothScroll();
+        if (state.autoScrollOn) stopAutoScroll();
+        if (e.touches && e.touches.length === 1) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        }
+      }, { passive: true });
+
+      scrollerEl.addEventListener('touchend', (e) => {
+        if (!e.changedTouches || e.changedTouches.length !== 1) return;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(dx) > 72 && Math.abs(dx) > Math.abs(dy) * 1.6) {
+          if (dx < 0) nextSong();
+          else prevSong();
+        }
+      }, { passive: true });
+
+      scrollerEl.addEventListener('wheel', () => {
+        cancelSmoothScroll();
+        if (state.autoScrollOn) stopAutoScroll();
+      }, { passive: true });
+
+      // Tap-to-Advance on empty area (bottom 72% = +1, top 28% = -1)
+      scrollerEl.addEventListener('click', (e) => {
         if (e.target.closest('.lyric-line')) return;
-        const rect = $('lyrics-scroller').getBoundingClientRect();
+        stopAutoScroll();
+        const rect = scrollerEl.getBoundingClientRect();
         const relY = (e.clientY - rect.top) / rect.height;
         setActiveLine(state.activeLineIdx + (relY < 0.28 ? -1 : 1), true);
       });
+
+      function prevSong() {
+        if (!state.concertSetlist || state.concertSongIdx <= 0) return;
+        stopAutoScroll();
+        state.concertSongIdx--;
+        state.activeLineIdx = 0;
+        renderConcertSong(-1);
+      }
+      function nextSong() {
+        if (!state.concertSetlist || state.concertSongIdx >= state.concertSetlist.songs.length - 1) return;
+        stopAutoScroll();
+        state.concertSongIdx++;
+        state.activeLineIdx = 0;
+        renderConcertSong(1);
+      }
 
       $('btn-concert-back').onclick = () => {
         $('dim-slider').value = 0;
@@ -1023,44 +1724,43 @@
         $('dim-val').textContent = '0%';
         showScreen(state.currentSetlistId ? 'screen-detail' : 'screen-home');
       };
-      $('btn-prev-song').onclick = () => {
-        if (!state.concertSetlist || state.concertSongIdx <= 0) return;
-        state.concertSongIdx--;
-        state.activeLineIdx = 0;
-        renderConcertSong();
-      };
-      $('btn-next-song').onclick = () => {
-        if (!state.concertSetlist || state.concertSongIdx >= state.concertSetlist.songs.length - 1) return;
-        state.concertSongIdx++;
-        state.activeLineIdx = 0;
-        renderConcertSong();
-      };
+      $('btn-prev-song').onclick = prevSong;
+      $('btn-next-song').onclick = nextSong;
       $('btn-toggle-hud').onclick = () => {
         state.hudVisible = !state.hudVisible;
         $('concert-bottom').classList.toggle('hidden', !state.hudVisible);
+      };
+      $('btn-autoscroll').onclick = () => {
+        if (state.autoScrollOn) stopAutoScroll();
+        else startAutoScroll();
+      };
+      $('btn-speed').onclick = () => {
+        state.speedIdx = (state.speedIdx + 1) % SPEEDS.length;
+        $('btn-speed').textContent = `${SPEEDS[state.speedIdx].toFixed(1)}x`;
       };
       $('dim-slider').oninput = (e) => {
         const val = Number(e.target.value);
         $('dim-overlay').style.opacity = (val / 100).toFixed(2);
         $('dim-val').textContent = `${val}%`;
       };
+      // Zero-DOM-rebuild CSS var font resize & translation toggle (instant 60fps!)
       $('btn-font-dec').onclick = () => {
         state.fontSize = Math.max(16, state.fontSize - 2);
-        renderConcertSong();
+        document.documentElement.style.setProperty('--lyric-size', state.fontSize + 'px');
       };
       $('btn-font-inc').onclick = () => {
         state.fontSize = Math.min(34, state.fontSize + 2);
-        renderConcertSong();
+        document.documentElement.style.setProperty('--lyric-size', state.fontSize + 'px');
       };
       $('btn-toggle-tr').onclick = () => {
         state.showTr = !state.showTr;
         $('btn-toggle-tr').textContent = state.showTr ? 'Dịch: Bật' : 'Dịch: Tắt';
-        renderConcertSong();
+        $('lyrics-track').classList.toggle('hide-tr', !state.showTr);
       };
-      $('btn-step-prev').onclick = () => setActiveLine(state.activeLineIdx - 1, true);
-      $('btn-step-next').onclick = () => setActiveLine(state.activeLineIdx + 1, true);
+      $('btn-step-prev').onclick = () => { stopAutoScroll(); setActiveLine(state.activeLineIdx - 1, true); };
+      $('btn-step-next').onclick = () => { stopAutoScroll(); setActiveLine(state.activeLineIdx + 1, true); };
 
-      // Home & Detail Actions
+      // Home & Detail Buttons
       $('btn-detail-back').onclick = () => { showScreen('screen-home'); renderHome(); };
       $('btn-start-concert').onclick = () => { const sl = currentSetlist(); if (sl) openConcert(sl, 0); };
       $('btn-add-song').onclick = () => openEditor(-1);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stageline-pwa-v2';
+const CACHE_NAME = 'stageline-pwa-v3';
 const PRECACHE_URLS = [
   './',
   './index.html',
@@ -34,7 +34,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  // Navigation requests: serve cached index.html immediately offline, update in background.
+  // Navigation requests: serve cached index.html immediately offline, update in background when online.
   if (req.mode === 'navigate') {
     event.respondWith(
       caches.match('./index.html').then((cached) => {
